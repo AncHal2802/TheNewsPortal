@@ -82,8 +82,8 @@ const Login = ({ setLoginUser }) => {
       <div className="loginPage flexDiv">
         <div className="contanier flexDiv">
           <div className="videoDiv w-[60%] h-[60%]">
-            {/* <video src={video} autoPlay muted loop></video> */}
-            <img src="/assests/exp.gif" alt="Logo Image" className="absolut" />
+          <video src='/videos/Video1.mp4' autoPlay muted loop></video>
+            
             <div className="textDiv">
               <h2 className="title">The News Portal </h2>
               <p>Engage, Explore, Evolve</p>
@@ -98,15 +98,11 @@ const Login = ({ setLoginUser }) => {
 
           <div className="fromDiv flexDiv">
             <div className="headerDiv overflow-hidden">
-              <img
-                src="/assests/logoExplore.png"
-                alt="Logo Image"
-                className="w-auto h-auto cale-110"
-              />
+<h1>The News Portal</h1>
+            
               <h3>Welcome Back Guys!!</h3>
             </div>
             <form onSubmit={login} className="form">
-              <span className="showMessage">Login Status will go here</span>
               <div className="inputDiv">
                 <label htmlFor="username">Email ID</label>
                 <div className="input flexDiv">
@@ -147,12 +143,13 @@ const Login = ({ setLoginUser }) => {
                   ""
                 )}
               </div>
+              <br></br>
 
               <button type="submit" className="btn flexDiv">
                 <span>Login</span>
                 <AiOutlineSwapRight className="icon" />
               </button>
-
+<br></br>
               <span className="forgotPassword">
                 Forgot password? <Link to="/forgortpassword">Click Here</Link>
               </span>

@@ -1,364 +1,245 @@
-/* .flexDiv */
-.flexDiv {
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif; 
+  background-color: #f0f0f0;
+}
+
+.loginPage {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100vh;
 }
-
-/* .gridDiv */
-.gridDiv {
-  display: grid;
+.registerPage{
+  margin-top: 25px;
+  display: flex;
   align-items: center;
-  gap: 1rem; /* Adjust the gap value as needed */
+  justify-content: center;
+  height: 110vh;
+
+}
+.registerPage .contanier{
+  margin-top:  15vh;
+  display: flex;
+  height: 90%;
+  width: 60%;
+  border-radius: 10px;
+
 }
 
-/* .icon */
-.icon {
-  font-size: var(--h2FontSize);
-  cursor: pointer;
+
+.contanier {
+  margin-top:  15vh;
+  display: flex;
+  height: 80%;
+  width: 60%;
+  border-radius: 10px;
 }
 
-/* .showMessage */
-.showMessage {
-  display: block;
-  color: var(--whiteColor);
+.videoDiv {
+  width: 50%; 
+  position: relative;
+  border-radius: 10px;
+  
+}
+
+.videoDiv video {
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover;
+  border-radius: 10px 0 0 10px ;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)); 
+
+}
+
+.videoDiv::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)); 
+}
+
+
+
+
+
+.headerDiv h3 {
+  font-size: 2vh;
+}
+
+
+
+.textDiv {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
-  padding: 9px;
-  border-radius: 0.125rem; /* Equivalent to rounded-sm */
-  background: rgb(255, 69, 0);
+  color: #ffffff;
+  font-size: 6vh;
+  font-weight: 20vh;
 }
 
-/* .btn */
+
+.fromDiv {
+
+  width: 50%; 
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.5rem; 
+  margin-bottom: 10px;
+}
+
+.footerDiv {
+  display: flex;
+  margin-top: 20px;
+  text-align: center;
+  align-items: center;
+}
+
+.footerDiv .text {
+  margin-left:40vh; 
+  display: flex;
+  align-items: center;
+
+}
+
+
 .btn {
-  cursor: pointer;
-  transition: ease-in-out 300ms;
-  text-align: center;
-  padding: 0.8rem;
-  border-radius: 1rem; /* Equivalent to rounded-lg */
+  background-color: #000000;
+  color: #fff;
+  padding: 10px 15px;
   border: none;
-  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center; /* Align horizontally center */
+  align-items: center; /* Align vertically center */
+  margin-left: 40%;
+text-decoration: none;
 }
 
 .btn:hover {
-  transform: scale(0.9);
-  color: white;
-  background: var(
-    --paleGreen
-  ); /* You need to define --paleGreen color variable */
+  border: 2px solid #060000; 
 }
 
-/* .btn .icon */
-.btn .icon {
-  margin-left: 0.5rem; /* You can adjust the margin as needed */
+
+.btn span {
+  margin-right: 5px;
 }
 
-/* .loginPage, .registerPage */
-.loginPage,
-.registerPage {
-  height: 100vh;
-  width: 100%;
+
+.headerDiv {
   overflow: hidden;
-  box-shadow: 0 7px 50px rgba(0, 0, 0, 0.7);
-  margin: auto;
-  border-radius: 1px;
-}
-
-/* .loginPage .contanier, .registerPage .contanier */
-.loginPage .contanier,
-.registerPage .contanier {
-  height: 100vh;
-  width: 100%;
-  justify-content: space-between;
-  margin: auto;
-  border-radius: 0;
-  background: hsl(0, 0%, 100%);
-}
-
-/* .loginPage .contanier .videoDiv, .registerPage .contanier .videoDiv */
-.loginPage .contanier .videoDiv,
-.registerPage .contanier .videoDiv {
-  position: relative;
-  display: flex;
-  flex-basis: 100%;
-  width: 100%;
-  height: 100%;
   text-align: center;
-  justify-content: center;
-  flex-direction: column;
-  overflow: hidden;
-  margin: auto;
-  padding: 0 6px;
-  border-radius: 0;
 }
 
-/* .loginPage .contanier .videoDiv img,
-   .loginPage .contanier .videoDiv .footerDiv,
-   .registerPage .contanier .videoDiv img,
-   .registerPage .contanier .videoDiv .footerDiv */
-.loginPage .contanier .videoDiv img,
-.loginPage .contanier .videoDiv .footerDiv,
-.registerPage .contanier .videoDiv img,
-.registerPage .contanier .videoDiv .footerDiv {
-  position: absolute;
+.headerDiv img {
+  width: 80px; 
+  height: 80px; 
+  margin-bottom: 10px;
 }
 
-/* .loginPage .contanier .videoDiv img,
-      .registerPage .contanier .videoDiv img */
-.loginPage .contanier .videoDiv img,
-.registerPage .contanier .videoDiv img {
-  height: 110%;
-  width: 100%;
-  object-fit: cover;
-  inset: 0;
+.headerDiv h3 {
+  font-size: 1.2rem; /* Adjusted font size */
 }
 
-/* .loginPage .contanier .videoDiv .textDiv,
-      .registerPage .contanier .videoDiv .textDiv */
-.loginPage .contanier .videoDiv .textDiv,
-.registerPage .contanier .videoDiv .textDiv {
-  position: absolute;
-  height: 10px;
-  padding: 0 4px;
-  left: 5px;
-  right: 2.5;
-  top: 1%;
+.form {
+  margin-top: 20px;
 }
 
-/* .loginPage .contanier .videoDiv .textDiv .title,
-      .registerPage .contanier .videoDiv .textDiv .title */
-.loginPage .contanier .videoDiv .textDiv .title,
-.registerPage .contanier .videoDiv .textDiv .title {
-  color: orangered;
-  font-size: 35px;
+.showMessage {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.inputDiv {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
   font-weight: bold;
+  text-align: center;
 }
 
-/* .loginPage .contanier .videoDiv .textDiv p,
-      .registerPage .contanier .videoDiv .textDiv p */
-.loginPage .contanier .videoDiv .textDiv p,
-.registerPage .contanier .videoDiv .textDiv p {
-  color: orangered;
-  font-size: 550;
-  padding: 4px;
+.input {
+  position: relative;
+  text-align: center;
+
 }
 
-/* .loginPage .contanier .videoDiv .footerDiv,
-   .registerPage .contanier .videoDiv .footerDiv */
-.loginPage .contanier .videoDiv .footerDiv,
-.registerPage .contanier .videoDiv .footerDiv {
-  height: 60px;
-  justify-content: space-between;
-  backdrop-filter: blur(1px);
-  padding: 0.8rem;
-  border-radius: 10px;
+
+.icon {
   position: absolute;
-  bottom: 2.5;
-  inset-x: 2.5;
-  background: rgba(255, 255, 255, 0.248);
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 20px;
 }
 
-/* .loginPage .contanier .videoDiv .footerDiv .text,
-      .registerPage .contanier .videoDiv .footerDiv .text */
-.loginPage .contanier .videoDiv .footerDiv .text,
-.registerPage .contanier .videoDiv .footerDiv .text {
-  color: white;
-}
-
-/* .loginPage .contanier .videoDiv .footerDiv .btn,
-      .registerPage .contanier .videoDiv .footerDiv .btn */
-.loginPage .contanier .videoDiv .footerDiv .btn,
-.registerPage .contanier .videoDiv .footerDiv .btn {
-  color: var(--primaryColor);
-  background-color: var(--whiteColor);
-  font-weight: normal;
-  transition: 0.3s ease-in-out;
-  duration: ease;
-  padding: 0.8rem;
-  border-radius: 10px;
-}
-
-/* .loginPage .contanier .videoDiv .footerDiv .btn:hover,
-      .registerPage .contanier .videoDiv .footerDiv .btn:hover */
-.loginPage .contanier .videoDiv .footerDiv .btn:hover,
-.registerPage .contanier .videoDiv .footerDiv .btn:hover {
-  background-color: var(--hoverColor);
-  color: var(--blackColor);
-  transition: ease-in-out 300ms;
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
 }
 
 .error {
-  color: #ef4444; /* Equivalent to text-red-500 in Tailwind */
+  color: #ff0000;
+  font-size: 12px;
+  margin-top: 5px;
 }
-
-.scrollDi {
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-}
-
-.loginPage .contanier .fromDiv,
-.registerPage .contanier .fromDiv {
-  flex-basis: 50%; /* Equivalent to basis-6/12 in Tailwind */
-  height: 100%;
-  flex-direction: column;
-  gap: 1.5rem; /* Equivalent to gap-6 in Tailwind */
-  transform: translateY(-1rem);
-  margin: auto;
-}
-
-.loginPage .contanier .fromDiv .headerDiv,
-.registerPage .contanier .fromDiv .headerDiv {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.forgotPassword {
   text-align: center;
-  padding: 0;
-  padding-top: 1.5rem; /* Equivalent to py-6 in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .headerDiv img,
-.registerPage .contanier .fromDiv .headerDiv img {
-  width: 300px;
-  padding-bottom: 0.25rem; /* Equivalent to pb-1 in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .headerDiv h3,
-.registerPage .contanier .fromDiv .headerDiv h3 {
-  font-size: 1.25rem; /* Equivalent to text-xl in Tailwind */
-  color: rgb(255, 254, 254);
-  font-weight: 600; /* Equivalent to font-semibold in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form,
-.registerPage .contanier .fromDiv .form {
-  display: grid;
-  display: -ms-flexbox;
+  margin-top: 10px;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem; /* Equivalent to gap-2 in Tailwind */
-  border-width: 0;
-  border-color: #fff; /* Equivalent to border-white in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv .icon,
-.registerPage .contanier .fromDiv .form .inputDiv .icon {
-  color: orangered; /* Equivalent to text-[orangered] in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv input,
-.registerPage .contanier .fromDiv .form .inputDiv input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none; /* Equivalent to bg-transparent, border-none, outline-none in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv label,
-.registerPage .contanier .fromDiv .form .inputDiv label {
-  color: #fff; /* Equivalent to text-white in Tailwind */
-  font-weight: normal; /* Equivalent to font-normal in Tailwind */
-  font-size: 0.875rem; /* Equivalent to text-sm in Tailwind */
-  display: block;
-  padding: 0;
-  padding-top: 0.5rem; /* Equivalent to py-2 in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv .radio,
-.registerPage .contanier .fromDiv .form .inputDiv .radio {
-  background-color: #fff;
-  gap: 0.5rem; /* Equivalent to gap-2 in Tailwind */
-  padding: 1rem; /* Equivalent to p-4 in Tailwind */
-  border-radius: 10px; /* Equivalent to rounded-[10px] in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv .input,
-.registerPage .contanier .fromDiv .form .inputDiv .input {
-  gap: 0.5rem; /* Equivalent to gap-2 in Tailwind */
-  padding: 1rem 2rem; /* Equivalent to px-4 py-2 in Tailwind */
-  border-radius: 10px; /* Equivalent to rounded-[10px] in Tailwind */
-  border-width: 1px; /* Equivalent to border-[1px] in Tailwind */
-  border-color: rgb(
-    231,
-    9,
-    9
-  ); /* Equivalent to border-[rgb(231,9,9)] in Tailwind */
-  transition: color 0.5s ease-in-out, background 0.5s ease-in-out; /* Equivalent to ease-in-out duration-500 in Tailwind */
-  background: rgb(235, 220, 220);
-}
-
-.loginPage .contanier .fromDiv .form .inputDiv .input:hover,
-.registerPage .contanier .fromDiv .form .inputDiv .input:hover,
-.loginPage .contanier .fromDiv .form .inputDiv .input:focus,
-.registerPage .contanier .fromDiv .form .inputDiv .input:focus {
-  color: #fff;
-  background: transparent;
-}
-
-.loginPage .contanier .fromDiv .form .btn,
-.registerPage .contanier .fromDiv .form .btn {
-  background-color: orangered; /* Equivalent to bg-[orangered] in Tailwind */
-  color: #fff; /* Equivalent to text-white in Tailwind */
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1rem; /* Equivalent to text-base in Tailwind */
-  width: 100%;
-  gap: 0.5rem; /* Equivalent to gap-2 in Tailwind */
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Equivalent to transition-[0.3s] ease-in-out duration-300 in Tailwind */
-  margin: auto;
-  padding: 0.8rem; /* Equivalent to p-[0.8rem] in Tailwind */
-  border-radius: 10px; /* Equivalent to rounded-[10px] in Tailwind */
+  align-items: center;
+  flex-direction: column; 
 }
 
-.loginPage .contanier .fromDiv .form .btn .icon,
-.registerPage .contanier .fromDiv .form .btn .icon {
-  font-size: 25px; /* Equivalent to text-[25px] in Tailwind */
-  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out; /* Equivalent to transition-[0.3s] ease-in-out duration-500 in Tailwind */
-  color: #fff; /* Equivalent to text-white in Tailwind */
+.forgotPassword a {
+  color: #007bff;
+  text-decoration: none;
+  margin-top: 5px; /* Adjust the margin as needed */
 }
 
-.loginPage .contanier .fromDiv .form .btn:hover,
-.registerPage .contanier .fromDiv .form .btn:hover {
-  background-color: var(
-    --hoverColor
-  ); /* Equivalent to bg-[color:var(--hoverColor)] in Tailwind */
-  color: var(
-    --blackColor
-  ); /* Equivalent to text-[color:var(--blackColor)] in Tailwind */
-  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Equivalent to ease-in-out duration-300 in Tailwind */
+.span{
+  padding: 20px;
+}
+.fromDiv h1{
+font-size: 5vh;
+padding: 17px;
+font-style: bolt;
+text-decoration: underline;
+}
+.loginPage .fromDiv h1{
+  padding: 30px;
 }
 
-.loginPage .contanier .fromDiv .form .btn:hover .icon,
-.registerPage .contanier .fromDiv .form .btn:hover .icon {
-  color: var(
-    --blackColor
-  ); /* Equivalent to text-[color:var(--blackColor)] in Tailwind */
-  transform: translateX(5px); /* Equivalent to translate-x-[5px] in Tailwind */
-  transition: transform 0.3s ease-in-out; /* Equivalent to ease-in-out duration-300 in Tailwind */
-}
+@media (max-width: 768px) {
+  .contanier {
+    flex-direction: column;
+  }
 
-.loginPage .contanier .fromDiv .form .forgotPassword,
-.registerPage .contanier .fromDiv .form .forgotPassword {
-  font-size: 0.875rem; /* Equivalent to text-sm in Tailwind */
-  color: #fff; /* Equivalent to text-white in Tailwind */
-  opacity: 0.7; /* Equivalent to opacity-70 in Tailwind */
-  text-align: center;
-}
-
-.loginPage .contanier .fromDiv .form .forgotPassword a,
-.registerPage .contanier .fromDiv .form .forgotPassword a {
-  text-decoration: underline; /* Equivalent to underline in Tailwind */
-  cursor: pointer;
-  opacity: 1; /* Equivalent to opacity-100 in Tailwind */
-  color: orangered; /* Equivalent to text-[orangered] in Tailwind */
-  transition: color 0.3s ease-in-out; /* Equivalent to hover:text-orange-400 active:text-[0.8rem] in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .forgotPassword a:hover,
-.registerPage .contanier .fromDiv .form .forgotPassword a:hover {
-  color: #ffac4d; /* Equivalent to hover:text-orange-400 in Tailwind */
-}
-
-.loginPage .contanier .fromDiv .form .forgotPassword a:active,
-.registerPage .contanier .fromDiv .form .forgotPassword a:active {
-  font-size: 0.8rem; /* Equivalent to active:text-[0.8rem] in Tailwind */
+  .videoDiv,
+  .fromDiv {
+    width: 80%; 
+  }
 }

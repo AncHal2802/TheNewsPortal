@@ -87,7 +87,6 @@ const Politics = () => {
                 <CardImage src={value.urlToImage} alt="News" />
                 <CardBody>
                   <h5>{value.title}</h5>
-                  <p>{value.description}</p>
                 
                 </CardBody>
               </Card>

@@ -1,10 +1,10 @@
-import express from "express";
-import cors from "cors";
-import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
-// import { Resend } from "resend";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
 dotenv.config();
 
 const app = express();
@@ -12,14 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-// {
-//   origin: ["https://explore-me.vercel.app"],
-//   methods: ["POST", "GET"],
-//   credentials: true,
-// }
-
 mongoose.connect(
-  // process.env.MONGO_URL,
   "mongodb+srv://jaibn1234:jaibn1234@jaibn1234.9nt3iqv.mongodb.net/DB?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
@@ -56,110 +49,118 @@ const userSchema = new mongoose.Schema(
 
 const User = new mongoose.model("User", userSchema);
 
-//Routes
-app.post("/login", async (req, res) => {
-  const { email, password } = await req.body;
-  const user = await User.findOne({ email: email });
-  // console.log(user);
-  if (!user) {
-    return res.send({ message: "User not registered" });
-  }
-  if (password === user.password) {
-    res.send({ message: "Login Successfull", status: "ok", user: user });
-  } else {
-    res.send({ message: "Password didn't match" });
-  }
-});
-
-app.post("/register", (req, res) => {
-  const { name, username, email, password } = req.body;
-  User.findOne({ email: email }, (err, user) => {
-    if (user) {
-      res.send({ message: "User already registerd" });
-    } else {
-      const user = new User({
-        name,
-        username,
-        email,
-        password,
-      });
-      user.save((err) => {
-        if (err) {
-          res.send({ error: err });
-        } else {
-          res.send({ message: "Successfully Registered, Please login now." });
-        }
-      });
-    }
-  });
-});
-
-// const resend = new Resend(process.env.RESEND_API_KEY);
-
-app.post("/forgortpassword", async (req, res) => {
-  const { email } = req.body;
-
-  const user = await User.findOne({ email: email });
-
-  if (!user) {
-    console.error("Error finding user:");
-    return res.status(404).json({ Status: "User not existed!" });
-  }
-
-  const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
-    expiresIn: "1d",
-  });
-
-  const url = `http://localhost:3000/reset_password/${user._id}/${token}`;
-  const emailHtml = `<h2>Click to reset password : ${url}</h2>`;
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "thenewsportal2023@gmail.com",
-      pass: "uzxjzmwhvbmjurio",
+const newsSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-  });
+    description: {
+      type: String,
+      required: true,
+    },
+    imageUrl: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-  const options = {
-    from: "it24img@gmail.com",
-    to: email,
-    subject: "Explore - Reset Password",
-    html: emailHtml,
-  };
+const News = mongoose.model('News', newsSchema);
 
-  const emailSender = await transporter.sendMail(options);
+const commentSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    newsId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'News',
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-  res.send({ message: "Check your email", user: user, data: emailSender });
+const Comment = mongoose.model('Comment', commentSchema);
+
+// Routes
+
+app.get('/news', async (req, res) => {
+  try {
+    const news = await News.find().sort({ createdAt: -1 });
+    res.send(news);
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
 });
 
-app.post('/reset-password/:id/:token', async (req, res) => {
-  const { id, token } = req.params
-  const { password } = req.body
+app.post('/news', async (req, res) => {
+  try {
+    const { title, description, imageUrl } = req.body;
+    const news = new News({
+      title,
+      description,
+      imageUrl,
+    });
 
-  jwt.verify(token, "jwt_secret_key", async (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Invalid token" });
+    await news.save();
+    res.send({ status: 'ok', message: 'News added successfully' });
+  } catch (error) {
+    console.error('Error adding news:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/comments/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Validate that userId is a valid ObjectId (assuming it's an ObjectId)
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({ error: 'Invalid ObjectId for userId' });
     }
-    try {
-      const userExists = await User.findOne({ _id: id })
-      if (!userExists) {
-        return res.send({ message: "Invalid token or ID" });
-      }
-      userExists.password = password;
 
-      await userExists.save();
-      res.send({ message: "Password Reset done" });
-    } catch (error) {
-      return res.send({ error: error });
+    const comments = await Comment.find({ userId: mongoose.Types.ObjectId(userId) }).sort({ createdAt: -1 });
+    res.send(comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/comments', async (req, res) => {
+  try {
+    const { userId, newsId, text } = req.body;
+
+    // Validate that userId and newsId are valid ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(newsId)) {
+      return res.status(400).send({ error: 'Invalid ObjectId for userId or newsId' });
     }
 
-  })
-})
+    const comment = new Comment({
+      userId: mongoose.Types.ObjectId(userId),
+      newsId: mongoose.Types.ObjectId(newsId),
+      text,
+    });
 
+    await comment.save();
+    res.send({ status: 'ok', message: 'Comment added successfully' });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
+});
+
+// ... (existing routes)
 
 app.listen(3000, () => {
   console.log("BE started at port 3000");

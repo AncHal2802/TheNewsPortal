@@ -83,7 +83,7 @@ const Register = () => {
     <div className="registerPage flexDiv ">
       <div className="contanier flexDiv">
         <div className="videoDiv">
-          <img src={""} alt="Logo Image" className="absolut" />
+        <video src='/videos/Video1.mp4' autoPlay muted loop></video>
           <div className="textDiv">
             <h2 className="title">The News Portal</h2>
             <p>Engage, Explore, Evolve</p>
@@ -98,11 +98,8 @@ const Register = () => {
 
         <div className="fromDiv scrollDi">
           <div className="headerDiv flex flex-col items-center justify-center overflow-hidden">
-            <img
-              src={"/assests/logoExplore.png"}
-              alt="Logo Image"
-              className="w-auto h-auto scale-90 border-[1px]"
-            />
+          <h1>The News Portal</h1>
+
             <h3>Let us Know about you!!</h3>
           </div>
 
