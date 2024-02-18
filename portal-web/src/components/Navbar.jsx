@@ -9,8 +9,9 @@ import SearchBar from './SearchBar';
 const Navbar = ({ onSearch }) => {
   const [prevScrollPos, setPrevScrollPos] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // Added state for mobile menu
   const location = useLocation();
-  const logged = window.localStorage.getItem("userLogged")
+  const logged = window.localStorage.getItem("userLogged");
 
   const handleScroll = () => {
     const currentScrollPos = window.scrollY;
@@ -26,6 +27,10 @@ const Navbar = ({ onSearch }) => {
     setPrevScrollPos(currentScrollPos);
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
 
@@ -34,12 +39,12 @@ const Navbar = ({ onSearch }) => {
     };
   }, [prevScrollPos, visible]);
 
-  const excludePaths = ['/', '/politics', '/buisness', '/sports', '/entertainment', '/login', '/register'];
+  const excludePaths = ['/', '/politics', '/business', '/sports', '/entertainment', '/login', '/register'];
 
   return (
     <nav className={`NavbarItem ${visible ? '' : 'scrolled'}`}>
       <div className='menu-icons'>
-        <i className='fa fa-bars'></i>
+        <i className='fa fa-bars' onClick={toggleMobileMenu}></i>
       </div>
       <div className='nav-logo-container'>
         <h1 className='navbar-logo'>The News Portal</h1>
@@ -52,7 +57,7 @@ const Navbar = ({ onSearch }) => {
 
       {excludePaths.indexOf(location.pathname) === -1 && <SearchBar onSearch={onSearch} />}
 
-      <ul className='nav-menu'>
+      <ul className={`nav-menu ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
         {MenuItems.map((item, index) => (
           <li key={index}>
             <Link className={item.cName} to={item.url}>
@@ -60,13 +65,13 @@ const Navbar = ({ onSearch }) => {
             </Link>
           </li>
         ))}
-        {logged == "false" &&
+        {logged === "false" &&
           <li>
             <Link type='button' className='nav-mobile' to='/login'>
               Login
             </Link>
           </li>}
-        {logged == "true" &&
+        {logged === "true" &&
           <li>
             <Link type='button' className='nav-mobile' to='/login' onClick={() => window.localStorage.setItem("userLogged", false)}>
               Logout

@@ -58,7 +58,7 @@ function App() {
           path="/reset_password/:id/:token"
           element={<ResetPassword />}
         />
-        <Route path="/newsDetails/:index/:title/:urlToImage" element={<NewsDetails />} />
+        <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
       </Routes>
     </div>
   );

@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -42,6 +43,9 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    userType: {
+      type: String,
     },
   },
   { timestamps: true }
@@ -91,8 +95,6 @@ const commentSchema = new mongoose.Schema(
 
 const Comment = mongoose.model('Comment', commentSchema);
 
-// Routes
-
 app.get('/news', async (req, res) => {
   try {
     const news = await News.find().sort({ createdAt: -1 });
@@ -103,64 +105,122 @@ app.get('/news', async (req, res) => {
   }
 });
 
-app.post('/news', async (req, res) => {
+app.post("/register", async (req, res) => {
   try {
-    const { title, description, imageUrl } = req.body;
-    const news = new News({
-      title,
-      description,
-      imageUrl,
-    });
+    const { name, username, email, password, userType } = req.body;
 
-    await news.save();
-    res.send({ status: 'ok', message: 'News added successfully' });
-  } catch (error) {
-    console.error('Error adding news:', error);
-    res.status(500).send({ error: 'Internal Server Error' });
-  }
-});
-
-app.get('/comments/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Validate that userId is a valid ObjectId (assuming it's an ObjectId)
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).send({ error: 'Invalid ObjectId for userId' });
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      return res.status(400).send({ message: "User already registered" });
     }
 
-    const comments = await Comment.find({ userId: mongoose.Types.ObjectId(userId) }).sort({ createdAt: -1 });
-    res.send(comments);
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    res.status(500).send({ error: 'Internal Server Error' });
-  }
-});
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-app.post('/comments', async (req, res) => {
-  try {
-    const { userId, newsId, text } = req.body;
-
-    // Validate that userId and newsId are valid ObjectIds
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(newsId)) {
-      return res.status(400).send({ error: 'Invalid ObjectId for userId or newsId' });
-    }
-
-    const comment = new Comment({
-      userId: mongoose.Types.ObjectId(userId),
-      newsId: mongoose.Types.ObjectId(newsId),
-      text,
+    const newUser = new User({
+      name,
+      username,
+      email,
+      password: hashedPassword,
+      userType,
     });
 
-    await comment.save();
-    res.send({ status: 'ok', message: 'Comment added successfully' });
+    await newUser.save();
+
+    res.status(201).send({ message: "Successfully Registered, Please login now." });
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error("Error during registration:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.send({ message: "User not registered" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (passwordMatch) {
+      if (user.userType === "Admin") {
+        res.send({ message: "Login Successful - Admin", status: "ok", user: user });
+      } else {
+        res.send({ message: "Login Successful", status: "ok", user: user });
+      }
+    } else {
+      res.send({ message: "Password didn't match" });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
     res.status(500).send({ error: 'Internal Server Error' });
   }
 });
 
-// ... (existing routes)
+app.post("/forgortpassword", async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    console.error("Error finding user:");
+    return res.status(404).json({ Status: "User not existed!" });
+  }
+
+  const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
+    expiresIn: "1d",
+  });
+
+  const url = `http://localhost:3000/reset_password/${user._id}/${token}`;
+  const emailHtml = `<h2>Click to reset password : ${url}</h2>`;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "thenewsportal2023@gmail.com",
+      pass: "uzxjzmwhvbmjurio",
+    },
+  });
+
+  const options = {
+    from: "it24img@gmail.com",
+    to: email,
+    subject: "Explore - Reset Password",
+    html: emailHtml,
+  };
+
+  const emailSender = await transporter.sendMail(options);
+
+  res.send({ message: "Check your email", user: user, data: emailSender });
+});
+
+app.post('/reset-password/:id/:token', async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
+
+  jwt.verify(token, "jwt_secret_key", async (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Invalid token" });
+    }
+    try {
+      const userExists = await User.findOne({ _id: id });
+      if (!userExists) {
+        return res.send({ message: "Invalid token or ID" });
+      }
+      userExists.password = password;
+
+      await userExists.save();
+      res.send({ message: "Password Reset done" });
+    } catch (error) {
+      return res.send({ error: error });
+    }
+  });
+});
 
 app.listen(3000, () => {
   console.log("BE started at port 3000");

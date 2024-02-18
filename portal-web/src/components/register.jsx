@@ -9,6 +9,8 @@ import { CiFaceSmile } from "react-icons/ci";
 import "../cStyles/register_login.css";
 
 const Register = () => {
+  const [userType, setUserType] = useState("User"); 
+  const [secretKey, setSecretKey] = useState('');
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
@@ -17,6 +19,7 @@ const Register = () => {
     email: "",
     password: "",
     reEnterPassword: "",
+    userType: ""
   });
 
   const handleName = (e) => {
@@ -55,35 +58,45 @@ const Register = () => {
 
   const register = (e) => {
     e.preventDefault();
-
-    const { name, username, email, password, reEnterPassword } = user;
-
-    if (
-      name.trim() !== "" &&
-      username.trim() !== "" &&
-      emailPattern.test(email) &&
-      password.length >= 6 &&
-      password === reEnterPassword
-    ) {
-      axios
-        .post("http://localhost:3000/register", user)  // Replace with your actual server API endpoint
-        .then((res) => {
-          alert(res.data.message);
-          navigate("/login");
-        })
-        .catch((error) => {
-          console.error("Registration error:", error);
-        });
+  
+    if (userType === "Admin" && secretKey !== "Anchal") {
+      alert("Invalid secret key");
     } else {
-      alert("Invalid input");
+      const { name, username, email, password, reEnterPassword } = user;
+  
+      if (
+        name.trim() !== "" &&
+        username.trim() !== "" &&
+        emailPattern.test(email) &&
+        password.length >= 6 &&
+        password === reEnterPassword
+      ) {
+        // Include userType in the user object
+        const userData = { ...user, userType }; // Use spread syntax to copy user object
+        axios
+          .post("http://localhost:3000/register", userData)
+          .then((res) => {
+            console.log(res.data);
+            alert(res.data.message);
+            navigate("/login");
+          })
+          .catch((error) => {
+            console.error("Registration error:", error);
+            alert("Registration failed. Please try again later.");
+          });
+      } else {
+        alert("Invalid input. Please check your details.");
+      }
     }
   };
+  
+  
 
   return (
     <div className="registerPage flexDiv ">
       <div className="contanier flexDiv">
         <div className="videoDiv">
-        <video src='/videos/Video1.mp4' autoPlay muted loop></video>
+          <video src="/videos/Video1.mp4" autoPlay muted loop></video>
           <div className="textDiv">
             <h2 className="title">The News Portal</h2>
             <p>Engage, Explore, Evolve</p>
@@ -98,10 +111,37 @@ const Register = () => {
 
         <div className="fromDiv scrollDi">
           <div className="headerDiv flex flex-col items-center justify-center overflow-hidden">
-          <h1>The News Portal</h1>
-
+            <h1>The News Portal</h1>
             <h3>Let us Know about you!!</h3>
           </div>
+          <div className="radioButtons">
+            <input
+              type="radio"
+              name="UserType"
+              value="User"
+              onChange={(e) => setUserType(e.target.value)}
+            />
+            User
+            <input
+              type="radio"
+              name="UserType"
+              value="Admin"
+              onChange={(e) => setUserType(e.target.value)}
+            />
+            Admin
+          </div>
+          {userType === "Admin" && (
+            <div className="input flexDiv">
+              <label>Secret Key</label>
+              <input
+                type="password" 
+                name="secretKey"
+                placeholder="secret key"
+                value={secretKey}
+                onChange={(e) => setSecretKey(e.target.value)}
+              />
+            </div>
+          )}
 
           <form onSubmit={register} className="form">
             <div className="inputDiv">
@@ -151,7 +191,7 @@ const Register = () => {
               <div className="input flexDiv">
                 <BsFillShieldLockFill className="icon" />
                 <input
-                  type="text"
+                  type="password"
                   name="password"
                   value={user.password}
                   placeholder="Set Password"
@@ -169,14 +209,18 @@ const Register = () => {
               <div className="input flexDiv">
                 <BsFillShieldLockFill className="icon" />
                 <input
-                  type="text"
+                  type="password"
                   name="reEnterPassword"
                   value={user.reEnterPassword}
                   placeholder="Re-enter Password"
                   onChange={passMatchHandler}
                 />
               </div>
-              {passMatchErr ? <span className="error">Mismatch Password</span> : ""}
+              {passMatchErr ? (
+                <span className="error">Mismatch Password</span>
+              ) : (
+                ""
+              )}
             </div>
             <button type="submit" className="btn flexDiv">
               <span>Register</span>

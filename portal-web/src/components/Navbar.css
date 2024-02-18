@@ -213,4 +213,14 @@ button:hover {
   .NavbarItem.scrolled.visible {
     transform: translateY(0);
   }
+  .menu-icons i {
+    font-size: 1.2rem;
+    color: #222; /* Adjust the color as needed */
+    cursor: pointer;
+  }
+  
+  .menu-icons i:hover {
+    color: #000000; /* Adjust the color on hover */
+    transition: color 0.2s ease-in-out;
+  }
 }

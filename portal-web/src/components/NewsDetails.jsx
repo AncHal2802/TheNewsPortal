@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './NewsDetails.css';
+import TopHeadings from '../routes/TopHeadings';
 
 const NewsDetails = () => {
-  const { index, title, urlToImage } = useParams();
+  const { index, title, urlToImage, description } = useParams();
 
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -25,9 +26,12 @@ const NewsDetails = () => {
   return (
     <div className='Info'>
       <h1>News Details</h1>
-      <p>Article Index: {index}</p>
-      <p>Article Title: {title}</p>
       <img src={urlToImage} alt="Article" />
+  
+      <h3>{title}</h3>
+      <p>{description}</p>
+
+      
 
       <div className="commentBox">
         <h2>Comments</h2>
@@ -44,6 +48,9 @@ const NewsDetails = () => {
             <li key={index}>{c}</li>
           ))}
         </ul>
+      </div>
+      <div className='flex-div'> 
+      <TopHeadings />
       </div>
     </div>
   );

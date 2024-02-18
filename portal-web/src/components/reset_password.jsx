@@ -11,6 +11,7 @@ function ResetPassword() {
 
     // axios.defaults.withCredentials = true;
     const handleSubmit = (e) => {
+        
         e.preventDefault();
         console.log(password);
         axios.post(`http://localhost:3000/reset-password/${id}/${token}`, { password }).then((res) => {

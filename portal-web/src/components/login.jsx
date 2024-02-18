@@ -1,31 +1,19 @@
 import React, { useState } from "react";
-// import "../App.css";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-// import LogoLight from "../assets/website/logo.png";
-// import LogoDark from "../assets/website/logoDark.png";
 import { FaUserShield } from "react-icons/fa";
 import { BsFillShieldLockFill } from "react-icons/bs";
 import { AiOutlineSwapRight } from "react-icons/ai";
-// import "../cStyles/register_login.css";
 import "../cStyles/register_login.css";
-const Login = ({ setLoginUser }) => {
-  const navigate = useNavigate();
 
+const Login = ({ setLoginUser,userType}) => {
+  const navigate = useNavigate();
+  const [admin, setAdmin] = useState(false);
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setUser({
-  //     ...user,
-  //     [name]: value,
-  //   });
-  // };
-
-  //validation for email
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [emailError, setEmailError] = useState(false);
   const handleEmail = (e) => {
@@ -37,11 +25,10 @@ const Login = ({ setLoginUser }) => {
     } else {
       setEmailError(false);
     }
-    // setUser({ email: inputValue });
     setUser((prevUser) => ({ ...prevUser, email: inputValue }));
   };
 
-  //validation for password
+  
   const [passErr, setPassErr] = useState(false);
   const handlePswd = (e) => {
     let pswd = e.target.value;
@@ -50,32 +37,34 @@ const Login = ({ setLoginUser }) => {
     } else if (pswd.length < 6) {
       setPassErr(true);
     } else {
-      // setUser({ password: pswd });
       setPassErr(false);
     }
-    // setUser({ password: pswd });
     setUser((prevUser) => ({ ...prevUser, password: pswd }));
   };
 
   const login = (e) => {
     e.preventDefault();
     const { email, password } = user;
-
+  
     if (!emailPattern.test(email)) {
       setEmailError(true);
     } else if (password.length < 6) {
       setPassErr(true);
     } else {
-      axios.post("http://localhost:3000/login", user).then((res) => {
+     
+      const updatedUser = { ...user, userType };
+      
+      axios.post("http://localhost:3000/login", updatedUser).then((res) => {
         alert(res.data.message);
-        if (res.data.status == "ok") {
-          window.localStorage.setItem("userLogged", true)
+        if (res.data.status === "ok") {
+          window.localStorage.setItem("userLogged", true);
           setLoginUser(res.data.user);
           navigate("/");
         }
       });
     }
   };
+
 
   return (
     <>

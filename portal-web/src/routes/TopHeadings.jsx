@@ -95,7 +95,7 @@ const TopHeadings = () => {
               <CardBody>
                 <h5>{value.title}</h5>
                 <Link
-                  to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}`}
+                  to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
                   state={{ articleData: value }}
                 >
                   <StyledButton target="_blank" rel="noopener noreferrer">
