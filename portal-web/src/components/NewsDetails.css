@@ -74,11 +74,13 @@
   }
   
   .comments-list {
+    width:30rem;
     list-style: none;
     padding: 0;
   }
   
   .comment-item {
+    
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     margin-bottom: 10px;
@@ -87,15 +89,21 @@
   }
   
   .comment-header {
+ align-items: flex;
     background-color: #007bff;
     color: #fff;
     padding: 10px;
     text-align: center;
   }
+
+strong{
+  font-display: flex-start;
+}
   
   .comment-body {
     padding: 15px;
     word-wrap: break-word;
+    background-color:white;
   }
   
   .comment-form {

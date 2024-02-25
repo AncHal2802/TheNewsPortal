@@ -132,13 +132,27 @@
 
 // export default NewsDetails;
 
- 
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './NewsDetails.css';
 import TopHeadings from '../routes/TopHeadings';
 import io from 'socket.io-client';
 import axios from 'axios';
+
+const getColorForUserInCommentBox = (() => {
+  const colorMap = {};
+
+  return (userId) => {
+    if (!colorMap[userId]) {
+      const hue = Object.keys(colorMap).length * 60;
+      const saturation = 50;
+      const lightness = 70;
+      colorMap[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    return colorMap[userId];
+  };
+})();
 
 const NewsDetails = () => {
   const { title, urlToImage, description } = useParams();
@@ -171,7 +185,6 @@ const NewsDetails = () => {
         });
 
         if (response.ok) {
-          // Clear the comment input
           setComment('');
         } else {
           console.error('Failed to add comment');
@@ -190,11 +203,9 @@ const NewsDetails = () => {
 
       if (response.ok) {
         const commentsData = await response.json();
-        console.log('Comments fetched:', commentsData);
 
-        // Assuming the comment data structure is like { userId: { name: "user name" }, text: "comment text" }
         const formattedComments = commentsData.map(({ userId, text }) => ({
-          userId: userId._id, // Assuming user ID is available in userId._id
+          userId: userId._id,
           userName: userId.name,
           text: text,
         }));
@@ -218,10 +229,8 @@ const NewsDetails = () => {
   };
 
   useEffect(() => {
-    // Use Promise.all to wait for both fetches to complete
     Promise.all([fetchComments(), fetchPolls()])
       .then(() => {
-        // Once both fetches are complete, set up the socket and any other logic
         socket.on('commentAdded', (newComment) => {
           setComments((prevComments) => [newComment, ...prevComments]);
         });
@@ -251,7 +260,6 @@ const NewsDetails = () => {
       });
 
       if (response.ok) {
-        // Update the local state with the new vote count
         setPolls((prevPolls) =>
           prevPolls.map((poll) => {
             if (poll._id === pollId) {
@@ -299,7 +307,7 @@ const NewsDetails = () => {
             {comments.length > 0 ? (
               comments.map((c, index) => (
                 <li key={index} className="comment-item">
-                  <div className="comment-header">
+                  <div className="comment-header" style={{ backgroundColor: getColorForUserInCommentBox(c.userId) }}>
                     <strong>{c.userName}</strong>
                   </div>
                   <div className="comment-body">
@@ -314,7 +322,7 @@ const NewsDetails = () => {
         </div>
         <div>
           {/* Poll section */}
-          {polls.map(poll => (
+          {Array.isArray(polls) && polls.map((poll) => (
             <div key={poll._id}>
               <h2>{poll.question}</h2>
               <ul>
@@ -334,4 +342,5 @@ const NewsDetails = () => {
 };
 
 export default NewsDetails;
+
 
