@@ -36,6 +36,7 @@
   }
   
   .hero-text .show {
+    margin-left: 20px;
     text-decoration: none;
     background-color: white;
     padding: 1rem 2rem;

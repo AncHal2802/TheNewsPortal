@@ -19,7 +19,7 @@ const Register = () => {
     email: "",
     password: "",
     reEnterPassword: "",
-    userType: ""
+    userType: "",
   });
 
   const handleName = (e) => {
@@ -72,7 +72,7 @@ const Register = () => {
         password === reEnterPassword
       ) {
         // Include userType in the user object
-        const userData = { ...user, userType }; // Use spread syntax to copy user object
+        const userData = { ...user, userType, comments: [] }; // Use spread syntax to copy user object
         axios
           .post("http://localhost:3000/register", userData)
           .then((res) => {

@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../components/Navbar';
-const Buisness = () => {
+const Business = () => {
   return (
     <>  
       <Navbar/>
@@ -8,4 +8,4 @@ const Buisness = () => {
   )
 }
 
-export default Buisness
+export default Business

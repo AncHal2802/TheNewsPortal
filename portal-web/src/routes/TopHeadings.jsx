@@ -59,11 +59,16 @@ const StyledButton = styled.a`
 `;
 
 const TopHeadings = () => {
+;
   const [searchResults, setSearchResults] = useState([]);
+  
 
   useEffect(() => {
     getNews();
   }, []);
+
+ 
+
 
   const getNews = (query = '') => {
     const apiUrl = query
@@ -75,6 +80,10 @@ const TopHeadings = () => {
       .then((response) => {
         console.log(response);
         setSearchResults(response.data.articles);
+
+        // STORING DATA INTO THE BACKEND : 
+        console.log( "Response : ", response);
+        console.log( "Response : ", response.data.articles);
       })
       .catch((error) => {
         console.error(error);
@@ -91,16 +100,18 @@ const TopHeadings = () => {
         <CardContainer>
           {searchResults.map((value, index) => (
             <Card key={index}>
-              <CardImage src={value.urlToImage} alt="News" />
+              <CardImage src={value.urlToImage}  alt="News" />
               <CardBody>
                 <h5>{value.title}</h5>
                 <Link
                   to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
                   state={{ articleData: value }}
                 >
-                  <StyledButton target="_blank" rel="noopener noreferrer">
+           <StyledButton target="_blank" rel="noopener noreferrer">
                     More
                   </StyledButton>
+
+
                 </Link>
               </CardBody>
             </Card>

@@ -6,16 +6,18 @@ import Navbar from "./components/Navbar";
 import Home from "./routes/Home";
 import Politics from "./routes/Politics";
 import Entertainment from "./routes/Entertainment";
-import Buisness from "./routes/Buisness"; // Corrected the typo in the import
+import Business from "./routes/Business"; // Corrected the typo in the import
 import Sports from "./routes/Sports";
 import TopHeadings from "./routes/TopHeadings";
 import Login from "./components/login";
-import SearchBar from "./components/SearchBar";
-import Footer from "./components/footer";
 import Register from "./components/register";
 import ForgotPassword from "./components/forgortpassword";
 import ResetPassword from "./components/reset_password";
 import NewsDetails from "./components/NewsDetails";
+import PricingApp from "./components/PricingApp";
+import Admin from "./components/Admin";
+import UpdateUser from "./components/UpdateUser";
+import Poll from "./components/Poll";
 
 function App() {
   const [user, setLoginUser] = useState(null);
@@ -32,7 +34,7 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar />
+      {/* <Navbar /> */}
       <Routes>
         <Route
           path="/"
@@ -40,13 +42,14 @@ function App() {
             logged === "true" ? <Home /> : <Login setLoginUser={setLoginUser} />
           }
         />
+        <Route path="/subscription" element={<PricingApp />} />
         <Route
           path="/top-heading"
           element={<TopHeadings searchResults={searchResults} />}
         />
         <Route path="/politics" element={<Politics />} />
         <Route path="/sports" element={<Sports />} />
-        <Route path="/buisness" element={<Buisness />} /> {/* Corrected the typo in the route path */}
+        <Route path="/business" element={<Business />} /> {/* Corrected the typo in the route path */}
         <Route path="/entertainment" element={<Entertainment />} />
         <Route path="/login" element={<Login setLoginUser={setLoginUser} />} />
         <Route path="/register" element={<Register />} />
@@ -59,7 +62,9 @@ function App() {
           element={<ResetPassword />}
         />
         <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
-      </Routes>
+        <Route path="/admin" element={<Admin/>}></Route>
+        <Route path="/update/:id" element={<UpdateUser />} />   
+     </Routes>
     </div>
   );
 }

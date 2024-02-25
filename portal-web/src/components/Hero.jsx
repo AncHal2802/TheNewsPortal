@@ -14,6 +14,11 @@ const Hero = (props) => {
         <a href={props.url} className={props.btnClass}>
           {props.btnText}
         </a>
+
+        {/* subscription */}
+        <a href={props.url2} className={props.btnClass2}>
+          {props.btnText2}
+        </a>
       </div>
     </>
   );

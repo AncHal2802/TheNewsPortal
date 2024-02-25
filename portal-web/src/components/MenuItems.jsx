@@ -1,4 +1,5 @@
 export const MenuItems = [
+
     {
         title : 'Home',
         url : '/',
@@ -20,7 +21,7 @@ export const MenuItems = [
     },
     {
         title : 'Buisness',
-        url : '/buisness',
+        url : '/business',
         cName :"nav-links",
         icon :"fa-solid fa-business-time",
     },

@@ -12,6 +12,7 @@ const Navbar = ({ onSearch }) => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false); // Added state for mobile menu
   const location = useLocation();
   const logged = window.localStorage.getItem("userLogged");
+  const userType = window.localStorage.getItem("userType");
 
   const handleScroll = () => {
     const currentScrollPos = window.scrollY;
@@ -39,7 +40,7 @@ const Navbar = ({ onSearch }) => {
     };
   }, [prevScrollPos, visible]);
 
-  const excludePaths = ['/', '/politics', '/business', '/sports', '/entertainment', '/login', '/register'];
+  const excludePaths = ['/', '/admin', '/politics', '/business', '/sports', '/entertainment', '/login', '/register', '/subscription', '/business'];
 
   return (
     <nav className={`NavbarItem ${visible ? '' : 'scrolled'}`}>
@@ -58,7 +59,14 @@ const Navbar = ({ onSearch }) => {
       {excludePaths.indexOf(location.pathname) === -1 && <SearchBar onSearch={onSearch} />}
 
       <ul className={`nav-menu ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+        <li>
+          {userType === "Admin" && <Link className="nav-links" to="/admin">
+            <i className="fa-solid fa-user"></i> Admin
+          </Link>
+          }
+        </li>
         {MenuItems.map((item, index) => (
+
           <li key={index}>
             <Link className={item.cName} to={item.url}>
               <i className={item.icon}></i> {item.title}
@@ -73,7 +81,7 @@ const Navbar = ({ onSearch }) => {
           </li>}
         {logged === "true" &&
           <li>
-            <Link type='button' className='nav-mobile' to='/login' onClick={() => window.localStorage.setItem("userLogged", false)}>
+            <Link type='button' className='nav-mobile' to='/login' onClick={() => window.localStorage.clear(  )}>
               Logout
             </Link>
           </li>}
