@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Container = styled.div`
   padding: 20px;
@@ -87,7 +88,16 @@ const Politics = () => {
                 <CardImage src={value.urlToImage} alt="News" />
                 <CardBody>
                   <h5>{value.title}</h5>
-                
+                  <Link
+                  to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
+                  state={{ articleData: value }}
+                >
+           <StyledButton target="_blank" rel="noopener noreferrer">
+                    More
+                  </StyledButton>
+
+
+                </Link>
                 </CardBody>
               </Card>
             </a>

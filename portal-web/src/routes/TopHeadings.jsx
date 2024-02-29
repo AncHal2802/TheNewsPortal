@@ -103,6 +103,7 @@ const TopHeadings = () => {
               <CardImage src={value.urlToImage}  alt="News" />
               <CardBody>
                 <h5>{value.title}</h5>
+                
                 <Link
                   to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
                   state={{ articleData: value }}

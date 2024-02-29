@@ -1,139 +1,5 @@
-// import React, { useState, useEffect } from 'react';
-// import { useParams } from 'react-router-dom';
-// import './NewsDetails.css';
-// import TopHeadings from '../routes/TopHeadings';
-// import io from 'socket.io-client';
-
-// const NewsDetails = () => {
-//   const { title, urlToImage, description } = useParams();
-//   const [comment, setComment] = useState('');
-//   const [comments, setComments] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const socket = io('http://localhost:3000'); // Connect to the Socket.io server
-
-//   const handleCommentChange = (e) => {
-//     setComment(e.target.value);
-//   };
-
-//   const handleCommentSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (comment.trim() !== '') {
-//       const userID = window.localStorage.getItem('userID');
-//       const newsId = title;
-
-//       try {
-//         setLoading(true);
-
-//         const response = await fetch('http://localhost:3000/comment', {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify({ userId: userID, newsId: newsId, text: comment }),
-//         });
-
-//         if (response.ok) {
-//           // Clear the comment input
-//           setComment('');
-//         } else {
-//           console.error('Failed to add comment');
-//         }
-//       } catch (error) {
-//         console.error('Error adding comment:', error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-//   };
-
-//   const fetchComments = async () => {
-//     try {
-//       const response = await fetch(`http://localhost:3000/show-comment?newsId=${title}&userID=${localStorage.getItem('userID')}`);
-
-//       if (response.ok) {
-//         const commentsData = await response.json();
-//         console.log('Comments fetched:', commentsData);
-
-//         // Assuming the comment data structure is like { userId: { name: "user name" }, text: "comment text" }
-//         const formattedComments = commentsData.map(({ userId, text }) => ({
-//           userName: userId.name,
-//           text: text,
-//         }));
-
-//         setComments(formattedComments);
-//       } else {
-//         console.error('Failed to fetch comments');
-//       }
-//     } catch (error) {
-//       console.error('Error fetching comments:', error);
-//     }
-//   };
-
-//   // Fetch Comments with Socket
-//   useEffect(() => {
-//     fetchComments();
-
-//     socket.on('commentAdded', (newComment) => {
-//       setComments((prevComments) => [...prevComments, newComment]);
-//     });
-
-//     socket.on('disconnect', () => {
-//       console.log('Socket disconnected');
-//     });
-
-//     return () => {
-//       socket.disconnect();
-//     };
-//   }, [title, socket]);
-
-//   return (
-//     <div className="page-container">
-//       <div className="top-heading">
-//         <TopHeadings />
-//       </div>
-//       <div className="content-container">
-//         <div className='Info'>
-//           <h3>{title}</h3>
-//           <img src={urlToImage} alt="Article" />
-//           <p>{description}</p>
-//         </div>
-//         <div className="commentBox">
-//           <h2>Comments</h2>
-//           <form onSubmit={handleCommentSubmit}>
-//             <textarea
-//               value={comment}
-//               onChange={handleCommentChange}
-//               placeholder="Enter your comment"
-//               disabled={loading}
-//             ></textarea>
-//             <button type="submit" disabled={loading}>
-//               {loading ? 'Submitting...' : 'Submit Comment'}
-//             </button>
-//           </form>
-//           {loading && <p>Loading...</p>}
-//           <ul>
-//             {comments.length > 0 ? (
-//               comments.map((c, index) => (
-//                 <li key={index}>
-//                   <strong>{c.userName}:</strong> {c.text}
-//                 </li>
-//               ))
-//             ) : (
-//               <li>No comments available</li>
-//             )}
-//           </ul>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default NewsDetails;
-
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './NewsDetails.css';
 import TopHeadings from '../routes/TopHeadings';
 import io from 'socket.io-client';
@@ -155,6 +21,7 @@ const getColorForUserInCommentBox = (() => {
 })();
 
 const NewsDetails = () => {
+  const navigate = useNavigate();
   const { title, urlToImage, description } = useParams();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -229,6 +96,8 @@ const NewsDetails = () => {
   };
 
   useEffect(() => {
+    const userFromLocalStorage = JSON.parse(localStorage.getItem('user'));
+    setUser(userFromLocalStorage);
     Promise.all([fetchComments(), fetchPolls()])
       .then(() => {
         socket.on('commentAdded', (newComment) => {
@@ -281,7 +150,14 @@ const NewsDetails = () => {
   return (
     <div className="page-container">
       <div className="top-heading">
-        <TopHeadings />
+        {user?.isPremium ? (
+          <TopHeadings />
+        ) : user ? (
+          <div>
+            <p>You need a subscription to access this feature.</p>
+            <button onClick={() => navigate('/subscription')}>Subscribe Now</button>
+          </div>
+        ) : null}
       </div>
       <div className="content-container">
         <div className='Info'>
@@ -339,7 +215,7 @@ const NewsDetails = () => {
       </div>
     </div>
   );
-};
+  };
 
 export default NewsDetails;
 

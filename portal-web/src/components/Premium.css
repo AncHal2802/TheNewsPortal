@@ -1,0 +1,63 @@
+.premium-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.subscriptions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.subscription-card {
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+
+  transition: transform 0.5s;
+}
+
+.subscription-card:hover {
+  transform: scale(1.05);
+}
+
+.card-title {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.card-price {
+  font-size: 20px;
+  color: #007bff;
+  margin-bottom: 25px;
+}
+
+.card-benefits {
+  text-align: left;
+  margin-bottom: 25px;
+}
+
+.card-button {
+  background-color: #5d64e0;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.card-button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 800px) {
+  .subscription-card {
+    width: 80%;
+  }
+}

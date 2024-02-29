@@ -5,6 +5,7 @@ import { MenuItems } from './MenuItems';
 import './Navbar.css';
 import Login from './login';
 import SearchBar from './SearchBar';
+import DateTimeDisplay from './DateTimeDisplay';
 
 const Navbar = ({ onSearch }) => {
   const [prevScrollPos, setPrevScrollPos] = useState(0);
@@ -49,7 +50,9 @@ const Navbar = ({ onSearch }) => {
       </div>
       <div className='nav-logo-container'>
         <h1 className='navbar-logo'>The News Portal</h1>
+        <DateTimeDisplay />
       </div>
+     
 
       {excludePaths.indexOf(location.pathname) === -1 && (
         <div className='search-icon-container'>

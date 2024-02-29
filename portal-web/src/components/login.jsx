@@ -157,7 +157,7 @@ const Login = ({ setLoginUser, userType }) => {
               </button>
               <br></br>
               <span className="forgotPassword">
-                Forgot password? <Link to="/forgortpassword">Click Here</Link>
+                Forgot password? <Link to="/forgotpassword">Click Here</Link>
               </span>
             </form>
           </div>

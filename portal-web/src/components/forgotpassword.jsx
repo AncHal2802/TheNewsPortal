@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from 'axios';
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -10,12 +10,18 @@ function ForgotPassword() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(email);
-    axios.post("http://localhost:3001/forgortpassword", { email: email }).then((res) => {
+    axios.post("http://localhost:3000/forgotpassword", { email: email }).then((res) => {
         alert(res.data.message);
         navigate("/login");
       });
   };
 
+  const isLoggedIn = window.localStorage.getItem("loggedIn");
+  console.log(window.localStorage.getItem("user-role"));
+
+  if (isLoggedIn == "true") {
+    return window.location.href = "/";
+  }
   return (
     <div className="flex justify-center items-center bg-secondary h-screen">
       <div className="bg-white p-3 rounded w-1/4">

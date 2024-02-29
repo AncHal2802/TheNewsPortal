@@ -11,13 +11,14 @@ import Sports from "./routes/Sports";
 import TopHeadings from "./routes/TopHeadings";
 import Login from "./components/login";
 import Register from "./components/register";
-import ForgotPassword from "./components/forgortpassword";
+import ForgotPassword from "./components/forgotpassword";
 import ResetPassword from "./components/reset_password";
 import NewsDetails from "./components/NewsDetails";
-import PricingApp from "./components/PricingApp";
+import Premium from "./components/Premium";
 import Admin from "./components/Admin";
 import UpdateUser from "./components/UpdateUser";
 import Poll from "./components/Poll";
+
 
 function App() {
   const [user, setLoginUser] = useState(null);
@@ -42,7 +43,7 @@ function App() {
             logged === "true" ? <Home /> : <Login setLoginUser={setLoginUser} />
           }
         />
-        <Route path="/subscription" element={<PricingApp />} />
+        <Route path="/subscription" element={<Premium />} />
         <Route
           path="/top-heading"
           element={<TopHeadings searchResults={searchResults} />}
@@ -54,16 +55,15 @@ function App() {
         <Route path="/login" element={<Login setLoginUser={setLoginUser} />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/forgotpassword"
-          element={<ForgotPassword />}
-        />
-        <Route
-          path="/reset_password/:id/:token"
-          element={<ResetPassword />}
-        />
+  path="/forgotpassword"  
+  element={<ForgotPassword />}
+/>
+<Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+
         <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
         <Route path="/admin" element={<Admin/>}></Route>
-        <Route path="/update/:id" element={<UpdateUser />} />   
+        <Route path="/update/:id" element={<UpdateUser />} />  
+       <Route path="/Home" element={<Home/>}/>
      </Routes>
     </div>
   );
