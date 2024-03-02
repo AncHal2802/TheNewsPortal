@@ -59,15 +59,46 @@ const StyledButton = styled.a`
 `;
 
 const TopHeadings = () => {
-;
+  ;
   const [searchResults, setSearchResults] = useState([]);
-  
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
     getNews();
   }, []);
 
- 
+
+  useEffect(() => {
+    const id = window.localStorage.getItem("userID");
+
+    const getSingleUser = async (id) => {
+      // const apiUrl = `http://localhost:3000/getSingleUser?userID=${id}`;
+      const apiUrl = `http://localhost:3000/getSingleUser/${id}`;
+
+      try {
+        // Make the API request with Fetch
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        setUserData(data);
+      } catch (error) {
+        console.error('Error fetching single user:', error);
+      }
+    };
+    getSingleUser(id);
+  }, []);
+
 
 
   const getNews = (query = '') => {
@@ -82,8 +113,8 @@ const TopHeadings = () => {
         setSearchResults(response.data.articles);
 
         // STORING DATA INTO THE BACKEND : 
-        console.log( "Response : ", response);
-        console.log( "Response : ", response.data.articles);
+        console.log("Response : ", response);
+        console.log("Response : ", response.data.articles);
       })
       .catch((error) => {
         console.error(error);
@@ -95,25 +126,31 @@ const TopHeadings = () => {
 
   return (
     <>
-      <Navbar onSearch={handleSearch}/>
+      <Navbar onSearch={handleSearch} />
       <Container>
         <CardContainer>
           {searchResults.map((value, index) => (
             <Card key={index}>
-              <CardImage src={value.urlToImage}  alt="News" />
+              <CardImage src={value.urlToImage} alt="News" />
               <CardBody>
                 <h5>{value.title}</h5>
-                
-                <Link
-                  to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
-                  state={{ articleData: value }}
-                >
-           <StyledButton target="_blank" rel="noopener noreferrer">
-                    More
-                  </StyledButton>
 
-
-                </Link>
+                {userData.isPremium ?
+                  <Link
+                    to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
+                    state={{ articleData: value }}
+                  >
+                    <StyledButton target="_blank" rel="noopener noreferrer">
+                      More
+                    </StyledButton>
+                  </Link> :
+                  <Link
+                    to={`/subscription`}
+                  >
+                    <StyledButton target="_blank" rel="noopener noreferrer">
+                      Subscribe to Read
+                    </StyledButton>
+                  </Link>}
               </CardBody>
             </Card>
           ))}

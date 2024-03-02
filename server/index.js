@@ -276,7 +276,26 @@ app.post('/reset-password/:id/:token', async (req, res) => {
       return res.send({ error: error.message });
     }
   });
+  1
 });
+
+// GET SINGLE USER
+app.get("/getSingleUser/:userID", async (req, res) => {
+  try {
+    const userID = req.params.userID; 
+    const user = await User.findById(userID, {}); 
+
+    // Check if the user is found
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+});
+
 
 // GET ALL USERS
 app.get("/getAllUser", async (req, res) => {
@@ -395,12 +414,12 @@ app.post("/api/store-payment-details", async (req, res) => {
     );
     console.log("Updated User:", updatedUser);
     const userEmail = updatedUser && updatedUser.email ? updatedUser.email : null;
-    
+
     //const fallbackEmail = "fallback@example.com";
     // Email content for payment receipt
     const mailOptions = {
       from: "thenewsportal2023@gmail.com", // Sender address
-      to: userEmail ,//|| fallbackEmail, // Recipient email from the updated user document
+      to: userEmail,//|| fallbackEmail, // Recipient email from the updated user document
       subject: "Payment Receipt - Explore Premium Subscription",
       html: `<p>Hello Reader !!</p>
         <p>You are now an EXPLORE Premium user :)</p>
@@ -445,5 +464,4 @@ app.post("/api/store-payment-details", async (req, res) => {
 server.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
-
 

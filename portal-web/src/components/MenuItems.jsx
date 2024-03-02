@@ -20,7 +20,7 @@ export const MenuItems = [
         icon :"fa-solid fa-volleyball",
     },
     {
-        title : 'Buisness',
+        title : 'Business',
         url : '/business',
         cName :"nav-links",
         icon :"fa-solid fa-business-time",

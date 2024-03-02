@@ -27,6 +27,7 @@ const Premium = () => {
   const [razorpayReady, setRazorpayReady] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const userID = window.localStorage.getItem('userID');
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -83,7 +84,7 @@ const Premium = () => {
         alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
         //navigate('../routes/Home');
         const paymentDetails = {
-          userId: user?._id, 
+          userId: userID, 
           paymentId: response.razorpay_payment_id,
           plan: planId,
           date: new Date().toISOString(),
@@ -100,7 +101,7 @@ const Premium = () => {
         .then(response => response.json())
         .then(data => {
           console.log('Payment details stored successfully:', data);
-          navigate("/Home");
+          navigate("/");
           if (data.message && data.message.startsWith('Failed to send receipt email')) {
             console.error('Failed to send receipt email:', data.error);
           } else {

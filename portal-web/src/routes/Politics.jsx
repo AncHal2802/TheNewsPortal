@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Politics from './Business';
 
 const Container = styled.div`
   padding: 20px;
@@ -59,12 +60,39 @@ const StyledButton = styled.a`
   }
 `;
 
-const Politics = () => {
+const Politcs = () => {
   const [data, setData] = useState([]);
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    const id = window.localStorage.getItem("userID");
+    getSingleUser(id);
+  }, []);
 
   useEffect(() => {
     getNews();
   }, []);
+
+  const getSingleUser = async (id) => {
+    const apiUrl = `http://localhost:3000/getSingleUser/${id}`;
+
+    try {
+      const response = await axios.get(apiUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.data.isPremium) {
+        // Handle non-premium user scenario
+      }
+
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Error fetching single user:', error);
+    }
+  };
 
   const getNews = () => {
     axios
@@ -88,16 +116,24 @@ const Politics = () => {
                 <CardImage src={value.urlToImage} alt="News" />
                 <CardBody>
                   <h5>{value.title}</h5>
-                  <Link
-                  to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
-                  state={{ articleData: value }}
-                >
-           <StyledButton target="_blank" rel="noopener noreferrer">
-                    More
-                  </StyledButton>
-
-
-                </Link>
+                  {userData.isPremium ? (
+                    <Link
+                      to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(
+                        value.urlToImage
+                      )}/${encodeURIComponent(value.description)}`}
+                      state={{ articleData: value }}
+                    >
+                      <StyledButton target="_blank" rel="noopener noreferrer">
+                        More
+                      </StyledButton>
+                    </Link>
+                  ) : (
+                    <Link to={`/subscription`}>
+                      <StyledButton target="_blank" rel="noopener noreferrer">
+                        Subscribe to Read
+                      </StyledButton>
+                    </Link>
+                  )}
                 </CardBody>
               </Card>
             </a>
@@ -108,4 +144,4 @@ const Politics = () => {
   );
 };
 
-export default Politics;
+export default Politcs;

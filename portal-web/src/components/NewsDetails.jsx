@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './NewsDetails.css';
 import TopHeadings from '../routes/TopHeadings';
@@ -27,6 +27,7 @@ const NewsDetails = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [polls, setPolls] = useState([]);
+  const [user, setUser] = useState(null); // Add user state
   const socket = io('http://localhost:3000');
 
   const handleCommentChange = (e) => {
@@ -215,8 +216,6 @@ const NewsDetails = () => {
       </div>
     </div>
   );
-  };
+};
 
 export default NewsDetails;
-
-
