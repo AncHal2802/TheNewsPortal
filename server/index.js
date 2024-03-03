@@ -132,7 +132,34 @@ app.post('/comment', async (req, res) => {
   }
 });
 
-// SHOW COMMENTS IN THE FRONTEND
+app.get('/api/comments', async (req, res) => {
+  try {
+    const allComments = await Comment.find().populate('userId', 'name');
+    res.json(allComments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// DELETE COMMENT
+app.delete('/api/comments/:commentId', async (req, res) => {
+  try {
+    const { commentId } = req.params;
+
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+
+    if (!deletedComment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // SHOW COMMENTS IN THE FRONTEND
 app.get('/show-comment', async (req, res) => {
   try {
@@ -325,9 +352,25 @@ app.post("/deleteUser", async (req, res) => {
   }
 });
 
-app.get('/polls', (req, res) => {
-  res.send('<h1>Poll Page</h1><Poll />');
+// Polls
+const pollSchema = new mongoose.Schema({
+  question: String,
+  options: [
+    {
+      text: String,
+      votes: { type: Number, default: 0 },
+    },
+  ],
+  votedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
+
+const Poll = mongoose.model('Poll', pollSchema);
+
+
+
+
+
+
 
 const paymentDetailSchema = new mongoose.Schema(
   {
@@ -459,9 +502,90 @@ app.post("/api/store-payment-details", async (req, res) => {
   }
 });
 
+app.use('/api/get-receipts', express.static(path.join(__dirname, 'receipts')));
+
+// Assuming you have the necessary Poll model and express setup
+app.post('/api/polls/create', async (req, res) => {
+  try {
+    const { question, options } = req.body;
+
+    if (!question || !options || options.length < 2) {
+      return res.status(400).json({ message: 'Invalid poll data' });
+    }
+
+    const newPoll = await Poll.create({
+      question,
+      options: options.map((text) => ({ text, votes: 0 })),
+      votedUsers: [],
+    });
+
+    res.status(201).json(newPoll);
+  } catch (error) {
+    console.error('Error creating poll:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/polls/:pollId/vote', async (req, res) => {
+  try {
+    const { pollId } = req.params;
+    const { optionIndex } = req.body;
+
+    const poll = await Poll.findById(pollId);
+
+    if (!poll) {
+      return res.status(404).json({ message: 'Poll not found' });
+    }
+
+    if (poll.votedUsers.includes(req.userId)) {
+      return res.status(400).json({ message: 'User has already voted for this poll' });
+    }
+
+    // Update the votes for the selected option
+    poll.options[optionIndex].votes += 1;
+    // Add the user to the votedUsers array to track their vote
+    poll.votedUsers.push(req.userId);
+
+    await poll.save();
+
+    res.json({ message: 'Vote recorded successfully' });
+  } catch (error) {
+    console.error('Error voting:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Assuming you have the necessary Poll model and express setup
+app.get('/api/polls', async (req, res) => {
+  try {
+    const allPolls = await Poll.find({});
+    res.json(allPolls);
+  } catch (error) {
+    console.error('Error fetching polls:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/polls/:pollId', async (req, res) => {
+  const { pollId } = req.params;
+
+  try {
+    // Assuming Poll is your model
+    const deletedPoll = await Poll.findByIdAndDelete(pollId);
+
+    if (!deletedPoll) {
+      return res.status(404).json({ error: 'Poll not found' });
+    }
+
+    res.json({ message: 'Poll deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting poll:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 server.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
-

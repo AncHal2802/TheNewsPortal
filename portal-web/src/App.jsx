@@ -17,7 +17,12 @@ import NewsDetails from "./components/NewsDetails";
 import Premium from "./components/Premium";
 import Admin from "./components/Admin";
 import UpdateUser from "./components/UpdateUser";
-import Poll from "./components/Poll";
+import Polls from "./components/Polls";
+import AdminPanel from "./components/AdminPanel";
+import AdminComments from "./components/AdminComments";
+import AdminPolls from "./components/AdminPolls";
+import Footer from "./components/footer";
+import AdminRecords from "./components/AdminRecords";
 
 
 function App() {
@@ -32,11 +37,26 @@ function App() {
     // Example: You can use axios to fetch data from your API
     // axios.get(`your_api_url?q=${query}`).then(response => setSearchResults(response.data));
   };
+ 
 
   return (
     <div className="App">
       {/* <Navbar /> */}
+    
       <Routes>
+        <Route
+          path="/admin/*"
+          element={<AdminPanel />}
+        >
+          <Route index element={<h2>Admin Dashboard</h2>} />
+          <Route path="adminUser" element={<Admin />} />
+          <Route path="adminComment" element={<AdminComments />} />
+          <Route path="adminPolls" element={<AdminPolls />} />
+          <Route path="adminPolls" element={<AdminRecords/>} />
+
+
+        </Route>
+
         <Route
           path="/"
           element={
@@ -61,10 +81,13 @@ function App() {
 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
 
         <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
-        <Route path="/admin" element={<Admin/>}></Route>
-        <Route path="/update/:id" element={<UpdateUser />} />  
-       <Route path="/Home" element={<Home/>}/>
+        <Route path="/update/:_id" element={<UpdateUser />} />
+
+        <Route path="/admin" element={<AdminPanel/>}/>
+        <Route path="/polls" element={<Polls/>}/>
+       
      </Routes>
+   
     </div>
   );
 }

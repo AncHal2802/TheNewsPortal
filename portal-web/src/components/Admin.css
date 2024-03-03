@@ -1,7 +1,9 @@
 .dataAd {
     margin-top: 8rem; 
     max-width: 800px;
-    margin-left: 35rem;
+    margin-left: 20rem;
+    justify-content: center;
+    align-content: center;
 }
 
 

@@ -1,34 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './NewsDetails.css';
 import TopHeadings from '../routes/TopHeadings';
 import io from 'socket.io-client';
-import axios from 'axios';
-
-const getColorForUserInCommentBox = (() => {
-  const colorMap = {};
-
-  return (userId) => {
-    if (!colorMap[userId]) {
-      const hue = Object.keys(colorMap).length * 60;
-      const saturation = 50;
-      const lightness = 70;
-      colorMap[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    }
-
-    return colorMap[userId];
-  };
-})();
+import Polls from './Polls';
 
 const NewsDetails = () => {
-  const navigate = useNavigate();
   const { title, urlToImage, description } = useParams();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [polls, setPolls] = useState([]);
-  const [user, setUser] = useState(null); // Add user state
-  const socket = io('http://localhost:3000');
+  const [userColors, setUserColors] = useState({});
+  const userType = window.localStorage.getItem("userType");
+
+  const socket = io('http://localhost:3000'); // Connect to the Socket.io server
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
@@ -53,6 +38,7 @@ const NewsDetails = () => {
         });
 
         if (response.ok) {
+          // Clear the comment input
           setComment('');
         } else {
           console.error('Failed to add comment');
@@ -65,100 +51,96 @@ const NewsDetails = () => {
     }
   };
 
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/show-comment?newsId=${title}`);
+  
+const getColorForUserInCommentBox = (() => {
+  const colorMap = {};
 
-      if (response.ok) {
-        const commentsData = await response.json();
-
-        const formattedComments = commentsData.map(({ userId, text }) => ({
-          userId: userId._id,
-          userName: userId.name,
-          text: text,
-        }));
-
-        setComments(formattedComments.reverse());
-      } else {
-        console.error('Failed to fetch comments');
-      }
-    } catch (error) {
-      console.error('Error fetching comments:', error);
+  return (userId) => {
+    if (!colorMap[userId]) {
+      const hue = Object.keys(colorMap).length * 60;
+      const saturation = 50;
+      const lightness = 70;
+      colorMap[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     }
-  };
 
-  const fetchPolls = async () => {
-    try {
-      const response = await axios.get('/api/polls');
-      setPolls(response.data);
-    } catch (error) {
-      console.error('Error fetching polls:', error);
-    }
+    return colorMap[userId];
   };
+})();
 
   useEffect(() => {
-    const userFromLocalStorage = JSON.parse(localStorage.getItem('user'));
-    setUser(userFromLocalStorage);
-    Promise.all([fetchComments(), fetchPolls()])
-      .then(() => {
-        socket.on('commentAdded', (newComment) => {
-          setComments((prevComments) => [newComment, ...prevComments]);
-        });
+    const fetchCommentsAndColors = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/show-comment?newsId=${title}&userID=${localStorage.getItem('userID')}`);
 
-        socket.on('disconnect', () => {
-          console.log('Socket disconnected');
-        });
+        if (response.ok) {
+          const commentsData = await response.json();
 
-        return () => {
-          socket.disconnect();
-        };
-      })
-      .catch((error) => {
-        console.error('Error during fetch:', error);
-      });
-  }, [title, socket]);
+          // Collect unique user IDs from comments
+          const uniqueUserIds = Array.from(new Set(commentsData.map(({ userId }) => userId._id)));
 
-  const handleVote = async (pollId, optionIndex) => {
-    try {
-      const userID = window.localStorage.getItem('userID');
-      const response = await fetch('http://localhost:3000/vote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: userID, pollId: pollId, optionIndex: optionIndex }),
-      });
+          // Generate colors for each user ID
+          const colors = uniqueUserIds.reduce((acc, userId, index) => {
+            const hue = index * 60;
+            const saturation = 50;
+            const lightness = 70;
+            acc[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            return acc;
+          }, {});
 
-      if (response.ok) {
-        setPolls((prevPolls) =>
-          prevPolls.map((poll) => {
-            if (poll._id === pollId) {
-              const updatedOptions = [...poll.options];
-              updatedOptions[optionIndex].votes++;
-              return { ...poll, options: updatedOptions };
-            }
-            return poll;
-          })
-        );
-      } else {
-        console.error('Failed to vote');
+          // Set the colors in the state
+          setUserColors(colors);
+
+          // Assuming the comment data structure is like { userId: { name: "user name" }, text: "comment text" }
+          const formattedComments = commentsData.map(({ userId, text }) => ({
+            userName: userId.name,
+            text: text,
+          }));
+
+          setComments(formattedComments);
+        } else {
+          console.error('Failed to fetch comments');
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
       }
-    } catch (error) {
-      console.error('Error voting:', error);
-    }
-  };
+    };
+
+    fetchCommentsAndColors();
+
+    socket.on('commentAdded', (newComment) => {
+      // Update user colors when a new comment is added
+      setUserColors((prevUserColors) => {
+        const userId = newComment.userId._id;
+        if (!prevUserColors[userId]) {
+          // Generate color for the new user
+          const hue = Object.keys(prevUserColors).length * 60;
+          const saturation = 50;
+          const lightness = 70;
+          return {
+            ...prevUserColors,
+            [userId]: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+          };
+        }
+        return prevUserColors;
+      });
+
+      // Update comments
+      setComments((prevComments) => [...prevComments, newComment]);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [title, socket]);
 
   return (
     <div className="page-container">
       <div className="top-heading">
-        {user?.isPremium ? (
-          <TopHeadings />
-        ) : user ? (
-          <div>
-            <p>You need a subscription to access this feature.</p>
-            <button onClick={() => navigate('/subscription')}>Subscribe Now</button>
-          </div>
-        ) : null}
+        <TopHeadings />
       </div>
       <div className="content-container">
         <div className='Info'>
@@ -166,6 +148,7 @@ const NewsDetails = () => {
           <img src={urlToImage} alt="Article" />
           <p>{description}</p>
         </div>
+        <Polls articleTitle={title} />
         <div className="commentBox">
           <h2>Comments</h2>
           <form onSubmit={handleCommentSubmit}>
@@ -196,22 +179,6 @@ const NewsDetails = () => {
               <li>No comments available</li>
             )}
           </ul>
-        </div>
-        <div>
-          {/* Poll section */}
-          {Array.isArray(polls) && polls.map((poll) => (
-            <div key={poll._id}>
-              <h2>{poll.question}</h2>
-              <ul>
-                {poll.options.map((option, index) => (
-                  <li key={index}>
-                    {option.option} - Votes: {option.votes}
-                    <button onClick={() => handleVote(poll._id, index)}>Vote</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
         </div>
       </div>
     </div>

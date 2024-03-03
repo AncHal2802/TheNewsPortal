@@ -1,99 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
+import { CiLogin } from 'react-icons/ci';
 
-const UpdateUser = () => {
-  const location = useLocation();
- const { _id } = useParams();
-console.log('_id:', _id);
-
-
-  const [values, setValues] = useState({
-    id: _id,
-    name: null,
-    email: null,
+function UpdateUser() {
+  const { id,email,name } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/getAllUser/${_id}`);
-        const user = response.data.user;
+        const response = await axios.get(`http://localhost:3000/getAllUser/${id}`);
+        const userData = response.data;
 
-        if (user) {
-          setValues((prevValues) => ({
-            ...prevValues,
-            id: user._id,  
-            name: user.name,
-            email: user.email,
-          }));
-        }
+        setUser({
+          name: userData.name,
+          email: userData.email,
+        });
       } catch (error) {
         console.error('Error fetching user:', error.message);
-        setError('Error fetching user data');
-      } finally {
-        setLoading(false);
+        // Handle error (e.g., show an error message)
       }
     };
 
-    fetchData();
-  }, [_id]);
+    fetchUser();
+  }, [id]);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-
+  const handleUpdate = async () => {
     try {
-      const response = await axios.put(`http://localhost:3000/updateUser/${values.id}`, values);
+      const response = await axios.put(`http://localhost:3000/updateUser/${id}`, user);
 
       if (response.status === 200) {
         console.log('User updated successfully:', response.data);
+        // Redirect to the user list page after a successful update
+        navigate('/user-list'); // Replace '/user-list' with your desired route
       } else {
         console.error('Failed to update user:', response.statusText);
-        setError('Failed to update user');
+        // Handle error (e.g., show an error message)
       }
     } catch (error) {
       console.error('Error updating user:', error.message);
-      setError('Error updating user');
+      // Handle error (e.g., show an error message)
     }
   };
 
   return (
     <div>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <form onSubmit={handleUpdate}>
-            <div>
-              <label htmlFor="name">Name: </label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter Name"
-                value={values.name || ''}
-                onChange={(e) => setValues((prevValues) => ({ ...prevValues, name: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label htmlFor="email">Email:</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter Email"
-                value={values.email || ''}
-                onChange={(e) => setValues((prevValues) => ({ ...prevValues, email: e.target.value }))}
-              />
-            </div>
-            <br />
-            <button type="submit">Update</button>
-          </form>
-        </>
-      )}
+      <h2>Edit User</h2>
+      <input
+        type="text"
+        value={user.name}
+        onChange={(e) => setUser({ ...user, name: e.target.value })}
+      />
+      <input
+        type="email"
+        value={user.email}
+        onChange={(e) => setUser({ ...user, email: e.target.value })}
+      />
+      <button onClick={handleUpdate}>Update User</button>
     </div>
   );
-};
+}
 
 export default UpdateUser;

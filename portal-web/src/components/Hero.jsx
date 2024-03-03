@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Hero.css';
+import Footer from './footer';
 
 const Hero = (props) => {
 
@@ -55,7 +56,9 @@ const Hero = (props) => {
             {props.btnText2}
           </a>
         }
+        
       </div >
+  
     </>
   );
 };

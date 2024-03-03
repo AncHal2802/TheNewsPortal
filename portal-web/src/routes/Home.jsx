@@ -33,8 +33,12 @@ const Home = () => {
       />
       <NewDis />
 
-      <MovingSlide images={images} />  <Footer />
+      <MovingSlide images={images} /> 
+      
+       <Footer />
+      
     </>
+    
   )
 }
 

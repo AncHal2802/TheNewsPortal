@@ -1,139 +1,142 @@
 .page-container {
-    display: flex;
-  }
-  
-  .top-heading {
-    width: 30%;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
-  
-  .content-container {
-    text-align: center;
-    justify-content: center;
-    margin-top: 8rem;
-    flex-grow: 1;
-    padding: 20px;
-    box-sizing: border-box;
-  }
+  display: flex;
+}
 
-  .content-container p{
-    font-size: 1.5rem;
+.top-heading {
+  width: 30%;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
 
-  }
-  
-  .Info {
-    max-width: 100%; 
-    margin-top: 0; 
-  }
+.content-container {
+  text-align: center;
+  justify-content: center;
+  margin-top: 8rem;
+  flex-grow: 1;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-  .Info img{
-    border-radius: 20px;
-    
-  }
+.content-container p{
+  font-size: 1.5rem;
+
+}
+
+.Info {
+  max-width: 100%; 
+  margin-top: 0; 
+}
+
+.Info img{
+  border-radius: 20px;
   
-  .commentBox {
-    text-align: left;
-    margin-top: 20px;
-  }
+}
+
+.commentBox {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.commentBox h2 {
+  margin-bottom: 10px;
+}
+
+.commentBox form {
+  margin-bottom: 15px;
+}
+
+.commentBox textarea {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.commentBox button {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.commentBox ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.commentBox li {
+  margin-bottom: 10px;
+}
+.commentBox {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.comments-list {
+  width:30rem;
+  list-style: none;
+  padding: 0;
+}
+
+.comment-item {
   
-  .commentBox h2 {
-    margin-bottom: 10px;
-  }
-  
-  .commentBox form {
-    margin-bottom: 15px;
-  }
-  
-  .commentBox textarea {
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-  }
-  
-  .commentBox button {
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .commentBox ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .commentBox li {
-    margin-bottom: 10px;
-  }
-  .commentBox {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-  }
-  
-  .comments-list {
-    width:30rem;
-    list-style: none;
-    padding: 0;
-  }
-  
-  .comment-item {
-    
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    overflow: hidden; /* Ensure proper rendering of floated elements */
-  }
-  
-  .comment-header {
- align-items: flex;
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px;
-    text-align: center;
-  }
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  overflow: hidden; /* Ensure proper rendering of floated elements */
+}
+
+.comment-header {
+align-items: flex;
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  width: 260px;
+  height: 40px;
+
+}
 
 strong{
-  font-display: flex-start;
+font-display: flex-start;
 }
-  
-  .comment-body {
-    padding: 15px;
-    word-wrap: break-word;
-    background-color:white;
-  }
-  
-  .comment-form {
-    margin-top: 20px;
-  }
-  
-  .comment-form textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .comment-form button {
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .comment-form button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .loading-message {
-    margin-top: 10px;
-    color: #007bff;
-  }
-  
+
+.comment-body {
+  padding: 15px;
+  word-wrap: break-word;
+  background-color:white;
+  height: 30px;
+}
+
+.comment-form {
+  margin-top: 20px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.comment-form button {
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.loading-message {
+  margin-top: 10px;
+  color: #007bff;
+}

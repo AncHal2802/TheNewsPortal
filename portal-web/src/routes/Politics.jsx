@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Politics from './Business';
+import Footer from '../components/footer';
 
 const Container = styled.div`
   padding: 20px;
