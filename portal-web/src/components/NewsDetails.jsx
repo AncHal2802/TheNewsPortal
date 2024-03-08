@@ -1,19 +1,144 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import './NewsDetails.css';
+import styled from 'styled-components';
 import TopHeadings from '../routes/TopHeadings';
 import io from 'socket.io-client';
 import Polls from './Polls';
+import randomColor from 'randomcolor';
+
+const PageContainer = styled.div`
+  display: flex;
+`;
+
+const TopHeading = styled.div`
+  width: 30%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
+
+const ContentContainer = styled.div`
+  text-align: center;
+  justify-content: center;
+  margin-top: 8rem;
+  flex-grow: 1;
+  padding: 4px;
+  box-sizing: border-box;
+`;
+
+const Info = styled.div`
+  max-width: 100%;
+  margin-top: 0;
+`;
+
+const InfoImage = styled.img`
+  border-radius: 20px;
+`;
+
+const CommentBox = styled.div`
+  text-align: left;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 800px; /* Increase the max-width as needed */
+  margin: 0 auto;
+`;
+
+const CommentBoxTitle = styled.h2`
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #333;
+`;
+
+const CommentForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  
+`;
+
+const CommentTextarea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+`;
+
+const CommentButton = styled.button`
+  padding: 10px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+`;
+
+const CommentsList = styled.ul`
+  width: 100%;
+  max-width: 900px; /* Increase the max-width as needed */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 20px; /* Add margin-top as needed */
+`;
+
+const CommentItem = styled.li`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex; /* Display items horizontally */
+  flex-direction: column; /* Align items vertically */
+`;
+const CommentContainer = styled.div`
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+`;
+
+const CommentHeader = styled.div`
+  text-align: left;
+  background-color: #007bff;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+`;;
+
+const Strong = styled.strong`
+  font-weight: bold;
+`;
+
+const CommentBody = styled.div`
+  word-wrap: break-word;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+`;
+
+const LoadingMessage = styled.p`
+  margin-top: 10px;
+  color: #007bff;
+`;
+
+const UserComment = styled.div`
+  background-color: #e0f7fa;
+`;
+
+const OtherComment = styled.div`
+  background-color: #f9f9f9;
+`;
 
 const NewsDetails = () => {
   const { title, urlToImage, description } = useParams();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [userColors, setUserColors] = useState({});
-  const userType = window.localStorage.getItem("userType");
+  const [replyToCommentId, setReplyToCommentId] = useState(null);
+  const loggedInUserId = window.localStorage.getItem('userID');
+  const socket = io('http://localhost:3000');
 
-  const socket = io('http://localhost:3000'); // Connect to the Socket.io server
+  const [userColors, setUserColors] = useState({});
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
@@ -23,8 +148,9 @@ const NewsDetails = () => {
     e.preventDefault();
 
     if (comment.trim() !== '') {
-      const userID = window.localStorage.getItem('userID');
+      const userID = loggedInUserId;
       const newsId = title;
+      const replyTo = replyToCommentId;
 
       try {
         setLoading(true);
@@ -34,12 +160,12 @@ const NewsDetails = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId: userID, newsId: newsId, text: comment }),
+          body: JSON.stringify({ userId: userID, newsId: newsId, text: comment, replyTo: replyTo }),
         });
 
         if (response.ok) {
-          // Clear the comment input
           setComment('');
+          setReplyToCommentId(null);
         } else {
           console.error('Failed to add comment');
         }
@@ -51,52 +177,46 @@ const NewsDetails = () => {
     }
   };
 
-  
-const getColorForUserInCommentBox = (() => {
-  const colorMap = {};
-
-  return (userId) => {
-    if (!colorMap[userId]) {
-      const hue = Object.keys(colorMap).length * 60;
-      const saturation = 50;
-      const lightness = 70;
-      colorMap[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    }
-
-    return colorMap[userId];
-  };
-})();
-
   useEffect(() => {
     const fetchCommentsAndColors = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/show-comment?newsId=${title}&userID=${localStorage.getItem('userID')}`);
+        const response = await fetch(`http://localhost:3000/show-comment?newsId=${title}&userID=${loggedInUserId}`);
 
         if (response.ok) {
           const commentsData = await response.json();
 
-          // Collect unique user IDs from comments
-          const uniqueUserIds = Array.from(new Set(commentsData.map(({ userId }) => userId._id)));
+          const colors = {};
+          commentsData.forEach(({ userId }) => {
+            if (!colors[userId._id]) {
+              colors[userId._id] = randomColor();
+            }
+          });
 
-          // Generate colors for each user ID
-          const colors = uniqueUserIds.reduce((acc, userId, index) => {
-            const hue = index * 60;
-            const saturation = 50;
-            const lightness = 70;
-            acc[userId] = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-            return acc;
-          }, {});
-
-          // Set the colors in the state
           setUserColors(colors);
 
-          // Assuming the comment data structure is like { userId: { name: "user name" }, text: "comment text" }
-          const formattedComments = commentsData.map(({ userId, text }) => ({
+          const formattedComments = commentsData.map(({ userId, text, replyTo }) => ({
+            commentId: userId._id,
             userName: userId.name,
             text: text,
+            replyTo: replyTo,
           }));
 
-          setComments(formattedComments);
+          const commentsWithReplies = formattedComments.reduce((acc, comment) => {
+            if (!comment.replyTo) {
+              acc.push(comment);
+            } else {
+              const parentCommentIndex = acc.findIndex((c) => c.commentId === comment.replyTo);
+              if (parentCommentIndex !== -1) {
+                if (!acc[parentCommentIndex].replies) {
+                  acc[parentCommentIndex].replies = [];
+                }
+                acc[parentCommentIndex].replies.push(comment);
+              }
+            }
+            return acc;
+          }, []);
+
+          setComments(commentsWithReplies.reverse());
         } else {
           console.error('Failed to fetch comments');
         }
@@ -108,24 +228,18 @@ const getColorForUserInCommentBox = (() => {
     fetchCommentsAndColors();
 
     socket.on('commentAdded', (newComment) => {
-      // Update user colors when a new comment is added
       setUserColors((prevUserColors) => {
         const userId = newComment.userId._id;
         if (!prevUserColors[userId]) {
-          // Generate color for the new user
-          const hue = Object.keys(prevUserColors).length * 60;
-          const saturation = 50;
-          const lightness = 70;
           return {
             ...prevUserColors,
-            [userId]: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+            [userId]: randomColor(),
           };
         }
         return prevUserColors;
       });
 
-      // Update comments
-      setComments((prevComments) => [...prevComments, newComment]);
+      setComments((prevComments) => [newComment, ...prevComments]);
     });
 
     socket.on('disconnect', () => {
@@ -135,53 +249,73 @@ const getColorForUserInCommentBox = (() => {
     return () => {
       socket.disconnect();
     };
-  }, [title, socket]);
+  }, [title, loggedInUserId, socket]);
 
   return (
-    <div className="page-container">
-      <div className="top-heading">
+    <PageContainer>
+      <TopHeading>
         <TopHeadings />
-      </div>
-      <div className="content-container">
-        <div className='Info'>
+      </TopHeading>
+      <ContentContainer>
+        <Info>
           <h3>{title}</h3>
-          <img src={urlToImage} alt="Article" />
+          <InfoImage src={urlToImage} alt="Article" />
           <p>{description}</p>
-        </div>
+        </Info>
         <Polls articleTitle={title} />
-        <div className="commentBox">
-          <h2>Comments</h2>
-          <form onSubmit={handleCommentSubmit}>
-            <textarea
+        <CommentBox>
+          <CommentBoxTitle>Comments</CommentBoxTitle>
+          <CommentForm onSubmit={handleCommentSubmit}>
+            <CommentTextarea
               value={comment}
               onChange={handleCommentChange}
               placeholder="Enter your comment"
               disabled={loading}
-            ></textarea>
-            <button type="submit" disabled={loading}>
+            ></CommentTextarea>
+            <CommentButton type="submit" disabled={loading}>
               {loading ? 'Submitting...' : 'Submit Comment'}
-            </button>
-          </form>
-          {loading && <p>Loading...</p>}
-          <ul className="comments-list">
+            </CommentButton>
+          </CommentForm>
+          {loading && <LoadingMessage>Loading...</LoadingMessage>}
+          <CommentsList>
             {comments.length > 0 ? (
               comments.map((c, index) => (
-                <li key={index} className="comment-item">
-                  <div className="comment-header" style={{ backgroundColor: getColorForUserInCommentBox(c.userId) }}>
-                    <strong>{c.userName}</strong>
-                  </div>
-                  <div className="comment-body">
-                    {c.text}
-                  </div>
-                </li>
+                <CommentItem
+                  key={index}
+                  className={`comment-item ${c.commentId === loggedInUserId ? 'user-comment' : 'other-comment'}`}
+                >
+                  <CommentContainer>
+                    <CommentHeader style={{ backgroundColor: userColors[c.commentId] }}>
+                      <Strong>{c.userName}</Strong>
+                    </CommentHeader>
+                    <CommentBody>{c.text}</CommentBody>
+                    {c.replies && (
+                      <CommentsList>
+                        {c.replies.map((reply, replyIndex) => (
+                          <CommentItem
+                            key={replyIndex}
+                            className={`comment-item ${reply.commentId === loggedInUserId ? 'user-comment' : 'other-comment'}`}
+                          >
+                            <CommentContainer>
+                              <CommentHeader style={{ backgroundColor: userColors[reply.commentId] }}>
+                                <Strong>{reply.userName}</Strong>
+                              </CommentHeader>
+                              <CommentBody>{reply.text}</CommentBody>
+                            </CommentContainer>
+                          </CommentItem>
+                        ))}
+                      </CommentsList>
+                    )}
+                  </CommentContainer>
+                </CommentItem>
               ))
             ) : (
-              <li>No comments available</li>
+              <CommentItem>No comments available</CommentItem>
             )}
-          </ul>
-        </div>
-      </div>
-    </div>
+          </CommentsList>
+        </CommentBox>
+      </ContentContainer>
+    </PageContainer>
   );
 };
 

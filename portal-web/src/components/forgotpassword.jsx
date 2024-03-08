@@ -1,54 +1,43 @@
-import React from "react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+import React, { useState } from 'react';
 import axios from 'axios';
 
 function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
-    console.log(email);
-    axios.post("http://localhost:3000/forgotpassword", { email: email }).then((res) => {
-        alert(res.data.message);
-        navigate("/login");
+
+    try {
+      const response = await axios.post('http://localhost:3000/forgotpassword', {
+        email: email,
       });
+
+      setMessage(response.data.message);
+    } catch (error) {
+      console.error('Error during forgot password:', error);
+      setError('Something went wrong. Please try again later.');
+    }
   };
 
-  const isLoggedIn = window.localStorage.getItem("loggedIn");
-  console.log(window.localStorage.getItem("user-role"));
-
-  if (isLoggedIn == "true") {
-    return window.location.href = "/";
-  }
   return (
-    <div className="flex justify-center items-center bg-secondary h-screen">
-      <div className="bg-white p-3 rounded w-1/4">
-        <h4 className="text-2xl font-bold mb-3">Forgot Password</h4>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email" className="block font-semibold">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Enter Email"
-              autoComplete="off"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-input rounded-0 w-full"
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn bg-success text-white w-full rounded-0"
-          >
-            Send
-          </button>
-        </form>
-      </div>
+    <div style={{ margin: '20px', padding: '20px', border: '1px solid #ccc' }}>
+      <h2>Forgot Password</h2>
+      <form onSubmit={handleForgotPassword}>
+        <label>Email:</label>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Submit</button>
+      </form>
+      {message && <p style={{ color: 'green' }}>{message}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }

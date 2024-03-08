@@ -6,6 +6,7 @@ import './Navbar.css';
 import Login from './login';
 import SearchBar from './SearchBar';
 import DateTimeDisplay from './DateTimeDisplay';
+import Dropdown from './Dropdown';
 
 const Navbar = ({ onSearch }) => {
   const [prevScrollPos, setPrevScrollPos] = useState(0);
@@ -41,7 +42,7 @@ const Navbar = ({ onSearch }) => {
     };
   }, [prevScrollPos, visible]);
 
-  const excludePaths = ['/', '/admin', '/politics', '/business', '/sports', '/entertainment', '/login', '/register', '/subscription', '/business'];
+  const excludePaths = ['/', '/admin', '/politics', '/business', '/sports', '/entertainment', '/login', '/register', '/subscription', '/business','/crime','/pahadi','/health','/science','/esports','/trading','/crypto'];
 
   return (
     <nav className={`NavbarItem ${visible ? '' : 'scrolled'}`}>
@@ -73,9 +74,20 @@ const Navbar = ({ onSearch }) => {
           <li key={index}>
             <Link className={item.cName} to={item.url}>
               <i className={item.icon}></i> {item.title}
+              
             </Link>
           </li>
         ))}
+          <Dropdown title="More" items={[
+            { title:'Entertainment', url: '/entertainment' },
+            { title: 'Trading', url: '/trading' },
+            { title: 'Crypto', url: '/crypto' },
+            { title: 'Crime', url: '/crime' },
+            { title: 'Esports', url: '/esports' },
+            { title: 'Science', url: '/science' },
+            { title: 'Health', url: '/health' },
+            { title: 'Pahadi', url: '/pahadi' },
+          ]} />
         {logged === "false" &&
           <li>
             <Link type='button' className='nav-mobile' to='/login'>

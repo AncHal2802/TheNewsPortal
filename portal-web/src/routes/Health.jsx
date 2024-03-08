@@ -62,7 +62,7 @@ const StyledButton = styled.a`
   }
 `;
 
-const Politics = () => {
+const Health = () => {
   const [data, setData] = useState([]);
   const [userData, setUserData] = useState({});
 
@@ -98,7 +98,7 @@ const Politics = () => {
 
   const getNews = () => {
     axios
-      .get("https://newsapi.org/v2/everything?q=politics&apiKey=13aa3840ad6542d1b4f13aa762e81db9")
+      .get("https://newsapi.org/v2/everything?q=health&apiKey=13aa3840ad6542d1b4f13aa762e81db9")
       .then((response) => {
         setData(response.data.articles.filter((item) => item.urlToImage)); // Filter out items without images
       })
@@ -148,4 +148,4 @@ const Politics = () => {
   );
 };
 
-export default Politics;
+export default Health;

@@ -25,11 +25,5 @@ export const MenuItems = [
         cName :"nav-links",
         icon :"fa-solid fa-business-time",
     },
-    {
-        title : 'Entertainment',
-        url : '/entertainment',
-        cName :"nav-links",
-        icon :"fa-solid fa-tv",
-    },
-   
+  
 ]

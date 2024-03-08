@@ -37,34 +37,37 @@ const Polls = () => {
     newOptions.splice(index, 1);
     setOptions(newOptions);
   };
-
   const handleVote = async (pollId, optionIndex) => {
     try {
       const response = await axios.post(
         `http://localhost:3000/api/polls/${pollId}/vote`,
         { optionIndex }
       );
-
-      setPolls((prevPolls) =>
-        prevPolls.map((poll) => {
-          if (poll._id === pollId) {
-            const updatedOptions = poll.options.map((opt, index) => {
-              if (index === optionIndex) {
-                return { ...opt, votes: opt.votes + 1 };
-              }
-              return opt;
-            });
-
-            return { ...poll, options: updatedOptions, voted: true };
-          }
-          return poll;
-        })
-      );
+  
+      if (response.status === 200) {
+        setPolls((prevPolls) =>
+          prevPolls.map((poll) => {
+            if (poll._id === pollId) {
+              const updatedOptions = poll.options.map((opt, index) => {
+                if (index === optionIndex) {
+                  return { ...opt, votes: opt.votes + 1 };
+                }
+                return opt;
+              });
+  
+              return { ...poll, options: updatedOptions };
+            }
+            return poll;
+          })
+        );
+      } else {
+        console.error('Failed to vote. Status:', response.status);
+      }
     } catch (error) {
       console.error('Error voting:', error);
     }
   };
-
+  
   const handleCreatePoll = async () => {
     try {
       const response = await axios.post('http://localhost:3000/api/polls/create', {
@@ -75,7 +78,7 @@ const Polls = () => {
       const createdPoll = response.data;
       console.log('Poll created:', createdPoll);
 
-      setPolls([...polls, { ...createdPoll, voted: false }]);
+      setPolls([...polls, { ...createdPoll }]);
       setQuestion('');
       setOptions(['', '']);
     } catch (error) {
@@ -126,10 +129,9 @@ const Polls = () => {
                   {option.text} - Votes: {option.votes}{' '}
                   <button
                     onClick={() => handleVote(poll._id, index)}
-                    disabled={poll.voted}
-                    className={poll.voted ? 'voted-button' : 'vote-button'}
+                    className='vote-button'
                   >
-                    {poll.voted ? 'Voted' : 'Vote'}
+                    Vote
                   </button>
                 </li>
               ))}

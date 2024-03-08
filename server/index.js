@@ -243,13 +243,13 @@ app.post("/forgotpassword", async (req, res) => {
     return res.status(404).json({ Status: "User not existed!" });
   }
 
-  const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
-
-  const url = `http://localhost:3000/reset_password/${user._id}/${token}`;
+  
+  const url = `http://localhost:3000/reset-password/${user._id}/${token}`;
   const emailHtml = `<h2>Click to reset password : ${url}</h2>`;
-
+  
   const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -277,34 +277,38 @@ app.post("/forgotpassword", async (req, res) => {
   });
 });
 
-// RESET PASSWORD
-app.post('/reset-password/:id/:token', async (req, res) => {
-  console.log("Received reset password request");
-  const { id, token } = req.params;
-  const { password } = req.body;
-  console.log("ID:", id);
-  console.log("Token:", token);
-  console.log("Password:", password);
 
-  jwt.verify(token, "jwt_secret_key", async (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ message: "Invalid token" });
-    }
-    try {
-      const userExists = await User.findOne({ _id: id });
-      if (!userExists) {
-        return res.send({ message: "Invalid token or ID" });
+
+// RESET PASSWORD
+app.get('/reset_password/:id/:token', async (req, res) => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
       }
-      userExists.password = password;
+
+      const userExists = await User.findOne({ _id: id });
+
+      if (!userExists) {
+        return res.json({ message: "Invalid token or user not found" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      userExists.password = hashedPassword;
 
       await userExists.save();
-      res.send({ message: "Password Reset done" });
-    } catch (error) {
-      return res.send({ error: error.message });
-    }
-  });
-  1
+      res.json({ message: "Password reset successful" });
+    });
+  } catch (error) {
+    console.error("Error during password reset:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
+
+
 
 // GET SINGLE USER
 app.get("/getSingleUser/:userID", async (req, res) => {

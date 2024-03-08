@@ -23,6 +23,14 @@ import AdminComments from "./components/AdminComments";
 import AdminPolls from "./components/AdminPolls";
 import Footer from "./components/footer";
 import AdminRecords from "./components/AdminRecords";
+import Trading from "./routes/Trading";
+import Crypto from "./routes/Crypto";
+import Crime from "./routes/Crime";
+import Esports from "./routes/Esports";
+import Science from "./routes/Science";
+import Health from "./routes/Health";
+import Pahadi from "./routes/Pahadi";
+import AdminDash from "./components/AdminDash";
 
 
 function App() {
@@ -53,6 +61,7 @@ function App() {
           <Route path="adminComment" element={<AdminComments />} />
           <Route path="adminPolls" element={<AdminPolls />} />
           <Route path="adminPolls" element={<AdminRecords/>} />
+          <Route path="admindash" element={<AdminDash/>}/>
 
 
         </Route>
@@ -72,13 +81,23 @@ function App() {
         <Route path="/sports" element={<Sports />} />
         <Route path="/business" element={<Business />} /> {/* Corrected the typo in the route path */}
         <Route path="/entertainment" element={<Entertainment />} />
+        <Route path="/trading" element={<Trading/>}/>
         <Route path="/login" element={<Login setLoginUser={setLoginUser} />} />
         <Route path="/register" element={<Register />} />
-        <Route
-  path="/forgotpassword"  
-  element={<ForgotPassword />}
-/>
-<Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+        <Route path="/crypto" element={<Crypto />} />
+        <Route path="/crime" element={<Crime />} />
+        <Route path="/esports" element={<Esports />} />
+        <Route path="/science" element={<Science />} />
+        <Route path="/health" element={<Health />} />
+        <Route path="/pahadi" element={<Pahadi />} />
+
+
+
+
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+
+
 
         <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
         <Route path="/update/:_id" element={<UpdateUser />} />

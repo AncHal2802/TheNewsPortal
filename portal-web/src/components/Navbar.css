@@ -7,18 +7,18 @@
   align-items: center;
   padding: 1rem 2rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff; /* White background color */
-  color: #000000; /* Black text color */
-  top: 20px; /* Adjusted top gap */
-  width: calc(100% - 40px); /* Adjusted width for left and right gaps */
-  position: fixed; /* Changed to fixed for floating */
-  z-index: 1000; /* Adjusted z-index to ensure it's above other content */
-  left: 20px; /* Added left gap */
+  background-color: #ffffff;
+  color: #000000;
+  top: 20px;
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
   border-radius: 10px;
+  transition: transform 0.3s ease-in-out;
 }
 
 .navbar-logo {
-  color: #000000; /* Black accent color for the logo */
+  color: #000000;
   font-size: 2.5rem;
   font-family: 'Times New Roman', serif;
   cursor: pointer;
@@ -29,9 +29,9 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  justify-content: space-between; /* Space between links */
-  width: 50%; /* Adjust the width as needed */
-  align-items: center; /* Center the content vertically */
+  justify-content: space-between;
+  width: 50%;
+  align-items: center;
 }
 
 .nav-item {
@@ -40,7 +40,7 @@
 
 .nav-links {
   text-decoration: none;
-  color: #000000; /* Black text color for links */
+  color: #000000;
   font-size: 1.2rem;
   font-family: 'Times New Roman', serif;
   font-weight: 600;
@@ -51,68 +51,59 @@
 }
 
 .nav-links:hover {
-  background-color: #000000; /* Light gray accent color on hover */
-  color: #ffffff; /* Black text color on hover */
+  background-color: #000000;
+  color: #ffffff;
 }
 
-/* Optional: Add a transition effect to the navbar links */
 .nav-links {
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 .nav-mobile {
   display: block;
-  padding: 0.5rem 1rem; /* Adjusted padding */
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  background-color: #eeeeee; /* Light gray accent color for the button */
-  color: #000000; /* Black text color for the button */
+  background-color: #eeeeee;
+  color: #000000;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 button {
   display: block;
-  padding: 0.5rem 1rem; /* Adjusted padding */
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   white-space: nowrap;
   font-size: 1rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  background-color: #eeeeee; /* Light gray accent color for the button */
-  color: #000000; /* Black text color for the button */
+  background-color: #eeeeee;
+  color: #000000;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 button:hover {
-  background-color: #000000; /* Light gray accent color for the button */
-  color: #ffffff; /* Black text color on hover */
+  background-color: #000000;
+  color: #ffffff;
 }
 
 .menu-icons {
   display: none;
 }
 
-.NavbarItem.scrolled {
-  transform: translateY(-100%);
-  transition: transform 0.3s ease-in-out;
-}
-
-.NavbarItem.scrolled.visible {
-  transform: translateY(0);
-}
-
 .search-icon-container {
-  position:left 20px;
-  top: 10px; 
+  position: absolute;
+  top: 10px;
   right: 10px;
   cursor: pointer;
   margin-right: 10px;
 }
+
 .search-icon-container i {
   font-size: 20px;
   display: flex;
@@ -127,9 +118,9 @@ button:hover {
   .nav-menu {
     display: flex;
     flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
-    background: #ffffff; 
+    background: #ffffff;
     width: 100%;
     height: auto;
     position: absolute;
@@ -183,44 +174,28 @@ button:hover {
     margin: auto;
     padding: 1.5rem;
     width: 200px;
-    background-color: #000000; /* White background color for mobile background */
+    background-color: #000000;
     text-decoration: none;
-    color: #ffffff; /* Black text color */
+    color: #ffffff;
     font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: 2px;
   }
 
-  /* Add this to your existing styles in Navbar.css */
   .nav-mobile:hover {
     background-color: #ffffff;
     color: #000000;
     transition: 0.2s;
     border-radius: 10px;
-    border: 2px solid black; /* Specify the border properties */
-    padding: 1.3rem; /* Add padding to create space for the border */
+    border: 2px solid black;
+    padding: 1.3rem;
   }
 
   .search-icon-container {
-    display: none; /* Hide the search icon on smaller screens */
-  }
-
-  .NavbarItem.scrolled {
-    transform: translateY(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .NavbarItem.scrolled.visible {
-    transform: translateY(0);
-  }
-  .menu-icons i {
-    font-size: 1.2rem;
-    color: #222; /* Adjust the color as needed */
+    position: absolute;
+    top: 10px;
+    right: 10px;
     cursor: pointer;
-  }
-  
-  .menu-icons i:hover {
-    color: #000000; /* Adjust the color on hover */
-    transition: color 0.2s ease-in-out;
+    margin-right: 10px;
   }
 }

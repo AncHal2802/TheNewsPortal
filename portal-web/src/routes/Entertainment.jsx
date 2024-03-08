@@ -14,6 +14,8 @@ const CardContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  max-height: 75vh; /* Set a maximum height for the container */
+  overflow-y: auto; /* Add a scrollbar when content overflows */
 `;
 
 const Card = styled.div`
@@ -24,10 +26,11 @@ const Card = styled.div`
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, overflow-y 0.3s ease-in-out;
 
   &:hover {
     transform: scale(1.05);
+    overflow-y: auto; /* Enable scrolling on hover */
   }
 `;
 
@@ -97,7 +100,7 @@ const Entertainment = () => {
     axios
       .get("https://newsapi.org/v2/everything?q=entertainment&apiKey=13aa3840ad6542d1b4f13aa762e81db9")
       .then((response) => {
-        setData(response.data.articles);
+        setData(response.data.articles.filter((item) => item.urlToImage)); // Filter out items without images
       })
       .catch((error) => {
         console.error('Error fetching news:', error);
@@ -110,32 +113,34 @@ const Entertainment = () => {
       <Container>
         <CardContainer>
           {data.map((value, index) => (
-            <a key={index} href={value.url} target="_blank" rel="noopener noreferrer">
-              <Card>
-                <CardImage src={value.urlToImage} alt="News" />
-                <CardBody>
-                  <h5>{value.title}</h5>
-                  {userData.isPremium ? (
-                    <Link
-                      to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(
-                        value.urlToImage
-                      )}/${encodeURIComponent(value.description)}`}
-                      state={{ articleData: value }}
-                    >
-                      <StyledButton target="_blank" rel="noopener noreferrer">
-                        More
-                      </StyledButton>
-                    </Link>
-                  ) : (
-                    <Link to={`/subscription`}>
-                      <StyledButton target="_blank" rel="noopener noreferrer">
-                        Subscribe to Read
-                      </StyledButton>
-                    </Link>
-                  )}
-                </CardBody>
-              </Card>
-            </a>
+            <Card key={index}>
+              <CardImage
+                src={value.urlToImage}
+                alt="News"
+                onError={(e) => e.target.style.display = 'none'}
+              />
+              <CardBody>
+                <h5>{value.title}</h5>
+                {userData.isPremium ? (
+                  <Link
+                    to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(
+                      value.urlToImage
+                    )}/${encodeURIComponent(value.description)}`}
+                    state={{ articleData: value }}
+                  >
+                    <StyledButton target="_blank" rel="noopener noreferrer">
+                      More
+                    </StyledButton>
+                  </Link>
+                ) : (
+                  <Link to={`/subscription`}>
+                    <StyledButton target="_blank" rel="noopener noreferrer">
+                      Subscribe to Read
+                    </StyledButton>
+                  </Link>
+                )}
+              </CardBody>
+            </Card>
           ))}
         </CardContainer>
       </Container>
