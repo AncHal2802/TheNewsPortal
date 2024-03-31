@@ -8,7 +8,9 @@ const CommentsList = () => {
     // Fetch comments from the API
     axios.get('http://localhost:3000/api/comments')
       .then(response => {
-        setComments(response.data);
+        // Sort comments by time in descending order
+        const sortedComments = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setComments(sortedComments);
       })
       .catch(error => {
         console.error('Error fetching comments:', error);
@@ -53,6 +55,7 @@ const CommentsList = () => {
           <p style={{ margin: 0, marginBottom: '8px' }}><strong>News ID:</strong> {comment.newsId}</p>
           <p style={{ margin: 0, marginBottom: '8px' }}><strong>Comment:</strong> {comment.text}</p>
           <p style={{ margin: 0, marginBottom: '8px' }}><strong>User:</strong> {comment.userId ? comment.userId.name : 'Unknown User'}</p>
+          <p style={{ margin: 0, marginBottom: '8px' }}><strong>Time:</strong> {new Date(comment.createdAt).toLocaleString()}</p>
           <button style={{
             backgroundColor: '#dc3545',
             color: '#fff',

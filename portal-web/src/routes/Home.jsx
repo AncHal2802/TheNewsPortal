@@ -2,8 +2,8 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import "../components/Hero.css"
-import NewDis from '../components/NewDis';
-import Footer from '../components/footer';
+import About from '../components/About';
+import Footer from '../components/Footer';
 import MovingSlide from '../components/MovingSlide';
 
 const Home = () => {
@@ -26,14 +26,13 @@ const Home = () => {
         btnText="Explore"
         url='top-heading'
         btnClass="show"
-        
+    
         btnText2="Subscription"
         url2='subscription'
         btnClass2="show"
       />
-      <NewDis />
+      <About />
 
-      <MovingSlide images={images} /> 
       
        <Footer />
       

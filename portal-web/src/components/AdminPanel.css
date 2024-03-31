@@ -6,6 +6,7 @@ body {
   
   .admin-panel {
     display: flex;
+    margin-top: 8rem;
   }
   
   .side-panel {

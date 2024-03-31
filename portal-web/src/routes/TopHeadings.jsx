@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Navbar from '../components/Navbar';
@@ -26,21 +25,35 @@ const Card = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
     transform: scale(1.05);
   }
 `;
 
+const CardImageContainer = styled.div`
+  height: 200px;
+  overflow: hidden;
+`;
+
 const CardImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
 `;
 
-const CardBody = styled.div`
+const ScrollableCardBody = styled.div`
+  flex-grow: 1;
   padding: 20px;
   text-align: center;
+  overflow: hidden;
+  transition: overflow 0.3s ease-in-out;
+
+  &:hover {
+    overflow: auto;
+  }
 `;
 
 const StyledButton = styled.a`
@@ -59,7 +72,6 @@ const StyledButton = styled.a`
 `;
 
 const TopHeadings = () => {
-  ;
   const [searchResults, setSearchResults] = useState([]);
   const [userData, setUserData] = useState({});
 
@@ -67,21 +79,18 @@ const TopHeadings = () => {
     getNews();
   }, []);
 
-
   useEffect(() => {
-    const id = window.localStorage.getItem("userID");
+    const id = window.localStorage.getItem('userID');
 
     const getSingleUser = async (id) => {
-      // const apiUrl = `http://localhost:3000/getSingleUser?userID=${id}`;
       const apiUrl = `http://localhost:3000/getSingleUser/${id}`;
 
       try {
-        // Make the API request with Fetch
         const response = await fetch(apiUrl, {
-          method: "GET",
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
         });
 
@@ -90,36 +99,31 @@ const TopHeadings = () => {
         }
 
         const data = await response.json();
-        console.log(data);
         setUserData(data);
       } catch (error) {
         console.error('Error fetching single user:', error);
       }
     };
+
     getSingleUser(id);
   }, []);
 
-
-
   const getNews = (query = '') => {
     const apiUrl = query
-      ? `https://newsapi.org/v2/everything?q=${query}&apiKey=13aa3840ad6542d1b4f13aa762e81db9`
-      : 'https://newsapi.org/v2/top-headlines?country=us&apiKey=13aa3840ad6542d1b4f13aa762e81db9';
+    
+    ? `https://newsapi.org/v2/everything?q=${query}&apiKey=13aa3840ad6542d1b4f13aa762e81db9`
+    : 'https://newsapi.org/v2/top-headlines?country=us&apiKey=13aa3840ad6542d1b4f13aa762e81db9';
 
     axios
       .get(apiUrl)
       .then((response) => {
-        console.log(response);
         setSearchResults(response.data.articles);
-
-        // STORING DATA INTO THE BACKEND : 
-        console.log("Response : ", response);
-        console.log("Response : ", response.data.articles);
       })
       .catch((error) => {
         console.error(error);
       });
   };
+
   const handleSearch = (query) => {
     getNews(query);
   };
@@ -131,27 +135,35 @@ const TopHeadings = () => {
         <CardContainer>
           {searchResults.map((value, index) => (
             <Card key={index}>
-              <CardImage src={value.urlToImage} alt="News" />
-              <CardBody>
-                <h5>{value.title}</h5>
+               <ScrollableCardBody>
+              <CardImageContainer>
+                {value.urlToImage && (
+                  <CardImage src={value.urlToImage} alt="News" />
+                )}
+              </CardImageContainer>
 
-                {userData.isPremium ?
+                <h5>{value.title}</h5>
+                {userData.isPremium || userData.userType === 'Admin' ? (
                   <Link
-                    to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(value.description)}`}
+                    to={`/newsDetails/${index}/${encodeURIComponent(
+                      value.title
+                    )}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(
+                      value.description
+                    )}/${encodeURIComponent(value.url)}`}
                     state={{ articleData: value }}
                   >
                     <StyledButton target="_blank" rel="noopener noreferrer">
                       More
                     </StyledButton>
-                  </Link> :
-                  <Link
-                    to={`/subscription`}
-                  >
+                  </Link>
+                ) : (
+                  <Link to={`/subscription`}>
                     <StyledButton target="_blank" rel="noopener noreferrer">
                       Subscribe to Read
                     </StyledButton>
-                  </Link>}
-              </CardBody>
+                  </Link>
+                )}
+              </ScrollableCardBody>
             </Card>
           ))}
         </CardContainer>

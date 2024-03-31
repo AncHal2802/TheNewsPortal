@@ -9,20 +9,15 @@ import dotenv from 'dotenv';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-
-
 import { writeFile } from "fs/promises";
-import fs from "fs"; // Import fs for createWriteStream and other fs operations
+import fs from "fs";
 import { fileURLToPath } from "url";
 import PDFDocument from "pdfkit"; // Make sure to import PDFDocument if you're using it for PDF generation
-
-
-
+import { log } from 'console';
 
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -174,7 +169,6 @@ app.get('/show-comment', async (req, res) => {
   }
 });
 
-
 // REGISTER USER
 app.post("/register", async (req, res) => {
   try {
@@ -211,26 +205,37 @@ app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
 
+    console.log("USER - ",password)
+    console.log("DATABASE - ", user.password);
+
     if (!user) {
       return res.send({ message: "User not registered" });
     }
 
+    // Check if password matches (assuming bcrypt is imported and used)
     const passwordMatch = await bcrypt.compare(password, user.password);
 
+    console.log("ENCRYPT Password ", passwordMatch);
+
     if (passwordMatch) {
-      if (user.userType === "Admin") {
-        res.send({ message: "Login Successful - Admin", status: "ok", user: user });
-      } else {
-        res.send({ message: "Login Successful", status: "ok", user: user });
-      }
+      return res.send({ message: "Password didn't match" });
+    }
+
+    // Password matched, create JWT token
+    const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "60m" });
+
+    // Additional logic from the first snippet
+    if (user.userType === "Admin") {
+      res.send({ message: "Login Successful - Admin", status: "ok", token: token, user: user });
     } else {
-      res.send({ message: "Password didn't match" });
+      res.send({ message: "Login Successful", status: "ok", token: token, user: user });
     }
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).send({ error: 'Internal Server Error' });
   }
 });
+
 
 // FORGOT PASSWORD
 app.post("/forgotpassword", async (req, res) => {
@@ -243,17 +248,17 @@ app.post("/forgotpassword", async (req, res) => {
     return res.status(404).json({ Status: "User not existed!" });
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
     expiresIn: "1d",
   });
-  
-  const url = `http://localhost:3000/reset-password/${user._id}/${token}`;
+
+  const url = `http://localhost:5173/reset_password/${user._id}/${token}`;
   const emailHtml = `<h2>Click to reset password : ${url}</h2>`;
-  
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
-    port: 587,
+    port: 465,
     secure: true,
     auth: {
       user: "thenewsportal2023@gmail.com",
@@ -262,59 +267,65 @@ app.post("/forgotpassword", async (req, res) => {
   });
 
   const options = {
-    from: "thenewsportal2023@gmail.com",
+    from: "it24img@gmail.com",
     to: email,
-    subject: "The News Portal - Reset Password",
+    subject: "TheNewsPortal- Reset Password",
     html: emailHtml,
   };
 
   const emailSender = await transporter.sendMail(options);
-  res.send({
-    message: "Check your email",
-    status: "ok",
-    user: user,
-    data: emailSender,
-  });
+
+  res.send({ message: "Check your email", user: user, data: emailSender });
 });
-
-
 
 // RESET PASSWORD
-app.get('/reset_password/:id/:token', async (req, res) => {
-  try {
-    const { id, token } = req.params;
-    const { password } = req.body;
+app.post("/reset-password/:id/:token", async (req, res) => {
+  const { id, token } = req.params;
+  const { password, resetAction } = req.body;
 
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+  console.log(id, token, password, resetAction);
 
-      const userExists = await User.findOne({ _id: id });
-
-      if (!userExists) {
-        return res.json({ message: "Invalid token or user not found" });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      userExists.password = hashedPassword;
-
-      await userExists.save();
-      res.json({ message: "Password reset successful" });
-    });
-  } catch (error) {
-    console.error("Error during password reset:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+  const user_exists = await User.findOne({ _id: id });
+  if (!user_exists) {
+    return res.send({ message: "Invalid User doesn't exists" });
   }
+
+  if (resetAction == "setNewPswd") {
+    const oldPswd = token;
+    if (oldPswd == user_exists.password) {
+      user_exists.password = password;
+      await user_exists.save();
+
+      return res.send({ message: "Password Reset successful!", status: "ok" });
+    } else {
+      return res.send({ message: "Old Password is worng or invalid" });
+    }
+  }
+  jwt.verify(token, "jwt_secret_key", async (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Invalid token" });
+    }
+    try {
+      if (!user_exists) {
+        return res.send({ message: "Invalid token or ID" });
+      }
+
+      user_exists.password = password;
+
+      await user_exists.save();
+
+      res.send({ message: "Password Reset done", status: "ok" });
+    } catch (error) {
+      return res.send({ error: error });
+    }
+  });
 });
-
-
 
 // GET SINGLE USER
 app.get("/getSingleUser/:userID", async (req, res) => {
   try {
-    const userID = req.params.userID; 
-    const user = await User.findById(userID, {}); 
+    const userID = req.params.userID;
+    const user = await User.findById(userID, {});
 
     // Check if the user is found
     if (!user) {
@@ -326,7 +337,6 @@ app.get("/getSingleUser/:userID", async (req, res) => {
     return res.status(500).send({ error: error.message });
   }
 });
-
 
 // GET ALL USERS
 app.get("/getAllUser", async (req, res) => {
@@ -358,6 +368,7 @@ app.post("/deleteUser", async (req, res) => {
 
 // Polls
 const pollSchema = new mongoose.Schema({
+  newsID : String,
   question: String,
   options: [
     {
@@ -371,20 +382,30 @@ const pollSchema = new mongoose.Schema({
 const Poll = mongoose.model('Poll', pollSchema);
 
 
-
-
-
-
-
 const paymentDetailSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    username: {
+      type: String,
+      required: true,
+    },
     paymentId: {
       type: String,
       required: true,
     },
     plan: {
+      type: String,
+      required: true,
+    },
+    amount: {
+      type: String,
+      required: true,
+    },
+    currency: {
       type: String,
       required: true,
     },
@@ -396,19 +417,25 @@ const paymentDetailSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    expiryDate: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const PaymentDetail = mongoose.model("PaymentDetail", paymentDetailSchema);
+const PaymentDetail = new mongoose.model("PaymentDetail", paymentDetailSchema);
 
-app.post("/api/store-payment-details", async (req, res) => {
-  console.log("Received payment details:", req.body);
+app.post("/store-payment-details", async (req, res) => {
   try {
-    const { userId, paymentId, plan, date } = req.body;
-    const pdfPath = `receipts/${paymentId}.pdf`; // Path where the PDF receipt will be saved
+    const { userId, amount, currency, paymentId, date, plan, username, email } = req.body;
+    console.log(userId, amount, currency, paymentId, email);
+    if (!userId || !amount || !currency) {
+      return res.status(404).json({ error: 'ValidationError', message: 'Required fields missing or invalid.' });
+    }
+    const pdfPath = `receipts/${paymentId}.pdf`;
 
-    // Format the date for display
     const formattedDate = new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -417,59 +444,68 @@ app.post("/api/store-payment-details", async (req, res) => {
       minute: "2-digit",
       timeZoneName: "short",
     });
-    // Ensure the receipts directory exists
+
     const receiptsDir = path.join(__dirname, "receipts");
     if (!fs.existsSync(receiptsDir)) {
       fs.mkdirSync(receiptsDir);
     }
 
-    // Generate PDF receipt
     const doc = new PDFDocument();
     doc.pipe(fs.createWriteStream(pdfPath));
     doc.fontSize(24).text("Payment Receipt", 100, 80);
     doc.fontSize(16).moveDown().text(`Date: ${formattedDate}`, 100);
     doc.text(`Payment ID: ${paymentId}`, 100);
     doc.text(`Plan: ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`, 100);
-    doc.text(`Amount: ${plan === "monthly" ? "2000" : "10000"}`, 100);
+    doc.text(`Amount: ${plan === "monthly" ? "₹49" : "₹499"}`, 100);
     doc.end();
 
-    // Store payment details
+    let expiryDate = new Date();
+    if (req.body.plan === "monthly") {
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+    } else if (req.body.plan === "annual") {
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    }
+
+    const readableAmount = `${currency} ${parseInt(amount) / 100}`;
+
     const paymentDetail = new PaymentDetail({
-      userId,
-      paymentId,
-      plan,
-      date,
+      userId: userId,
+      username: username,
+      paymentId: paymentId,
+      plan: plan,
+      date: date,
+      amount: amount,
+      currency: currency,
       isPremium: true,
+      expiryDate,
     });
+
     await paymentDetail.save();
+    await User.findByIdAndUpdate({ "_id": userId }, {
+      $set: { role2: "premium", isPremium: true, expiryDate },
+    });
+    res.json({
+      message: "Subscription successful",
+      expiryDate: expiryDate.toISOString(),
+    });
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
       port: 587,
-      secure: true, // Note: `secure` should be false for port 587, true for port 465
+      secure: true,
       auth: {
-        user: "thenewsportal2023@gmail.com", // Your Gmail address
-        pass: "uzxjzmwhvbmjurio", // Your Gmail password or App Password
+        user: "thenewsportal2023@gmail.com",
+        pass: "uzxjzmwhvbmjurio",
       },
     });
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $set: { isPremium: true } },
-      { new: true }
-    );
-    console.log("Updated User:", updatedUser);
-    const userEmail = updatedUser && updatedUser.email ? updatedUser.email : null;
-
-    //const fallbackEmail = "fallback@example.com";
-    // Email content for payment receipt
     const mailOptions = {
-      from: "thenewsportal2023@gmail.com", // Sender address
-      to: userEmail,//|| fallbackEmail, // Recipient email from the updated user document
-      subject: "Payment Receipt - Explore Premium Subscription",
-      html: `<p>Hello Reader !!</p>
-        <p>You are now an EXPLORE Premium user :)</p>
+      from: "thenewsportal2023@gmail.com",
+      to: email,
+      subject: "Payment Receipt - The News Portal Premium Subscription",
+      html: `<p>Hello ${username}!!</p>
+        <p>You are now an Portal Premium user :)</p>
         <p>You can now use all our premium features.</p>
         <p>Please download your attached payment receipt.</p>`,
       attachments: [
@@ -495,23 +531,61 @@ app.post("/api/store-payment-details", async (req, res) => {
         res.json({
           message:
             "Payment details stored, user updated to premium, and receipt sent successfully.",
+          expiryDate: expiryDate,
         });
       }
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error", error);
     res
       .status(500)
       .json({ message: "Internal Server Error", error: error.toString() });
   }
 });
 
+// Add a new route to get all payments
+app.get("/api/get-payments", async (req, res) => {
+  try {
+    const payments = await PaymentDetail.find();
+    res.json({ payments });
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.toString() });
+  }
+});
+
 app.use('/api/get-receipts', express.static(path.join(__dirname, 'receipts')));
+
+app.post("/get-user", async (req, res) => {
+  const { email, username } = req.body;
+  console.log(username);
+  try {
+    let userInfo;
+    if (username) {
+      userInfo = await User.findOne({ username });
+    } else {
+      userInfo = await User.findOne({ email });
+    }
+
+    if (!userInfo) {
+      return res.send({ message: "User doesn't exist!", status: 400 });
+    }
+    return res.send({
+      message: "User data found",
+      status: "ok",
+      user: userInfo,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 // Assuming you have the necessary Poll model and express setup
 app.post('/api/polls/create', async (req, res) => {
   try {
-    const { question, options } = req.body;
+    const { question, options, newsID } = req.body;
+
+    console.log("NEWS ID - ", newsID);
 
     if (!question || !options || options.length < 2) {
       return res.status(400).json({ message: 'Invalid poll data' });
@@ -521,6 +595,7 @@ app.post('/api/polls/create', async (req, res) => {
       question,
       options: options.map((text) => ({ text, votes: 0 })),
       votedUsers: [],
+      newsID
     });
 
     res.status(201).json(newPoll);
@@ -533,7 +608,7 @@ app.post('/api/polls/create', async (req, res) => {
 app.post('/api/polls/:pollId/vote', async (req, res) => {
   try {
     const { pollId } = req.params;
-    const { optionIndex } = req.body;
+    const { optionIndex} = req.body;
 
     const poll = await Poll.findById(pollId);
 
@@ -587,8 +662,6 @@ app.delete('/api/polls/:pollId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-
 
 server.listen(3000, () => {
   console.log('Server is running on port 3000');

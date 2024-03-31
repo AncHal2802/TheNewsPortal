@@ -16,6 +16,16 @@ const TopHeading = styled.div`
   box-sizing: border-box;
 `;
 
+const StyledLink = styled.a`
+  color: #007bff; 
+  text-decoration: none;
+  font-weight: bold;
+font-size:20px;
+ padding: 10px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 const ContentContainer = styled.div`
   text-align: center;
   justify-content: center;
@@ -28,6 +38,11 @@ const ContentContainer = styled.div`
 const Info = styled.div`
   max-width: 100%;
   margin-top: 0;
+  margin-bottom: 10px;
+  p {
+    font-size: 27px; 
+  }
+
 `;
 
 const InfoImage = styled.img`
@@ -130,7 +145,7 @@ const OtherComment = styled.div`
 `;
 
 const NewsDetails = () => {
-  const { title, urlToImage, description } = useParams();
+  const { title, urlToImage, description, url } = useParams();
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -260,7 +275,8 @@ const NewsDetails = () => {
         <Info>
           <h3>{title}</h3>
           <InfoImage src={urlToImage} alt="Article" />
-          <p>{description}</p>
+          <p>{description}</p><StyledLink href={url}>Read More</StyledLink>
+          
         </Info>
         <Polls articleTitle={title} />
         <CommentBox>
@@ -285,7 +301,7 @@ const NewsDetails = () => {
                   className={`comment-item ${c.commentId === loggedInUserId ? 'user-comment' : 'other-comment'}`}
                 >
                   <CommentContainer>
-                    <CommentHeader style={{ backgroundColor: userColors[c.commentId] }}>
+                    <CommentHeader>
                       <Strong>{c.userName}</Strong>
                     </CommentHeader>
                     <CommentBody>{c.text}</CommentBody>

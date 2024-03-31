@@ -2,12 +2,14 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import "./AdminPanel.css"
+import Navbar from './Navbar';
 import UserGraph from './UserGraph';
 
 const AdminPanel = () => {
   return (
     <div className="admin-panel">
-      {/* Side Panel */}
+      <Navbar />
+    
       <div className="side-panel">
         <Link to="/admin/admindash">Dashboard</Link>
         <Link to="/admin/adminUser">Users</Link>

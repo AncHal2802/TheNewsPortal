@@ -1,50 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { Worker, Viewer } from '@react-pdf-viewer/core';
-import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-import axios from 'axios';
 
-const PdfViewer = () => {
-  const [pdfFiles, setPdfFiles] = useState([]);
-  const [selectedPdf, setSelectedPdf] = useState(null);
+const AdminRecords = () => {
+  const [paymentData, setPaymentData] = useState([]);
 
   useEffect(() => {
-    const fetchPdfFiles = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/get-receipts');
-        setPdfFiles(response.data);
-      } catch (error) {
-        console.error('Error fetching PDF files:', error);
-      }
-    };
+    // Fetch data from the API
+    fetch('http://localhost:3000/api/get-payments')
+      .then(response => response.json())
+      .then(data => {
+        // Check if data is an array, or an object with a 'payments' property
+        const paymentsArray = Array.isArray(data) ? data : (data.payments || []);
+        setPaymentData(paymentsArray);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, []); 
 
-    fetchPdfFiles();
-  }, []);
-
-  const handlePdfSelection = (pdf) => {
-    setSelectedPdf(pdf);
-  };
+  console.log(paymentData); // Log the type of paymentData
 
   return (
     <div>
-      <h2>PDF Viewer</h2>
-      <div className="pdf-list">
-        {pdfFiles.map((pdf, index) => (
-          <div key={index} className="pdf-item" onClick={() => handlePdfSelection(pdf)}>
-            {pdf}
-          </div>
-        ))}
-      </div>
-      {selectedPdf && (
-        <div>
-          <h3>Selected PDF: {selectedPdf}</h3>
-          {/* Use the Worker and Viewer components from react-pdf-viewer */}
-          <Worker workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`}>
-            <Viewer fileUrl={`http://localhost:3000/api/get-receipts/${selectedPdf}`} />
-          </Worker>
-        </div>
-      )}
+      <h2>User Payment Details</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Payment ID</th>
+            <th>Plan</th>
+            <th>Date</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paymentData.map(payment => (
+            <tr key={payment._id}>
+              <td>{payment.userId}</td>
+              <td>{payment.username}</td>
+              <td>{payment.paymentId}</td>
+              <td>{payment.plan}</td>
+              <td>{payment.date}</td>
+              <td>{payment.amount}</td>
+--            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
-
-export default PdfViewer;
+export default AdminRecords;

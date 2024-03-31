@@ -81,7 +81,7 @@ const Admin = () => {
               <th>Name</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Edit</th>
+            
               <th>Delete</th>
             </tr>
           </thead>
@@ -91,11 +91,6 @@ const Admin = () => {
                 <td>{user.name}</td>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
-                <td>
-                  <Link to={`/update/${user._id}`}>
-                    <button>Edit</button>
-                </Link>
-                </td>
                 <td>
                   <button onClick={() => deleteUser(user._id, user.name)}>Delete</button>
                 </td>

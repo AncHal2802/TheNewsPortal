@@ -7,6 +7,7 @@ import Login from './login';
 import SearchBar from './SearchBar';
 import DateTimeDisplay from './DateTimeDisplay';
 import Dropdown from './Dropdown';
+import UserProfile from './UserProfile';
 
 const Navbar = ({ onSearch }) => {
   const [prevScrollPos, setPrevScrollPos] = useState(0);
@@ -42,7 +43,7 @@ const Navbar = ({ onSearch }) => {
     };
   }, [prevScrollPos, visible]);
 
-  const excludePaths = ['/', '/admin', '/politics', '/business', '/sports', '/entertainment', '/login', '/register', '/subscription', '/business','/crime','/pahadi','/health','/science','/esports','/trading','/crypto'];
+  const excludePaths = ['/', '/admin', '/login','/admin/admindash', '/register','/admin/adminUser','/admin/adminComment','/admin/adminPolls','/admin/adminRecords'];
 
   return (
     <nav className={`NavbarItem ${visible ? '' : 'scrolled'}`}>
@@ -88,18 +89,12 @@ const Navbar = ({ onSearch }) => {
             { title: 'Health', url: '/health' },
             { title: 'Pahadi', url: '/pahadi' },
           ]} />
-        {logged === "false" &&
-          <li>
-            <Link type='button' className='nav-mobile' to='/login'>
-              Login
-            </Link>
-          </li>}
-        {logged === "true" &&
-          <li>
-            <Link type='button' className='nav-mobile' to='/login' onClick={() => window.localStorage.clear(  )}>
-              Logout
-            </Link>
-          </li>}
+        <li>
+          {logged === "true" && (
+            <UserProfile
+            />
+          )}
+          </li>
       </ul>
     </nav>
   );

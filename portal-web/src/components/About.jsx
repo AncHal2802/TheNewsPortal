@@ -1,10 +1,11 @@
 import React from 'react';
 import Card1 from './Card1';
 import Logo1 from '../../src/images/portal.jpeg';
-import '../components/NewDis.css'
+import '../components/About.css'
 import AuthenImg from '../../src/images/image-2.png';
+import Navbar from './Navbar';
 
-const NewDis = () => {
+const About = () => {
   return (
     <div className='NewDes'>
      <div className="container">
@@ -50,4 +51,4 @@ const NewDis = () => {
   );
 };
 
-export default NewDis;
+export default About;

@@ -3,8 +3,8 @@ import UserGraph from './UserGraph'
 import './AdminDash.css'
 const AdminDash = () => {
   return (
-  <div> 
-       <h1>Dashboard</h1>
+  <div className='center'> 
+       <h1>User Statistics</h1>
      <div className='bar'>  
        
     <UserGraph/>

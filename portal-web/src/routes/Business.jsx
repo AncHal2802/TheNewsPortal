@@ -14,8 +14,6 @@ const CardContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  max-height: 75vh; /* Set a maximum height for the container */
-  overflow-y: auto; /* Add a scrollbar when content overflows */
 `;
 
 const Card = styled.div`
@@ -26,23 +24,36 @@ const Card = styled.div`
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease-in-out, overflow-y 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
     transform: scale(1.05);
-    overflow-y: auto; /* Enable scrolling on hover */
   }
+`;
+
+const CardImageContainer = styled.div`
+  height: 200px;
+  overflow: hidden;
 `;
 
 const CardImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
 `;
 
-const CardBody = styled.div`
+const ScrollableCardBody = styled.div`
+  flex-grow: 1;
   padding: 20px;
   text-align: center;
+  overflow: hidden;
+  transition: overflow 0.3s ease-in-out;
+
+  &:hover {
+    overflow: auto;
+  }
 `;
 
 const StyledButton = styled.a`
@@ -50,8 +61,6 @@ const StyledButton = styled.a`
   background-color: #2ecc71;
   color: #fff;
   padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   text-decoration: none;
@@ -62,70 +71,85 @@ const StyledButton = styled.a`
   }
 `;
 
-const Buisness = () => {
-  const [data, setData] = useState([]);
+const Business = () => {
+  const [searchResults, setSearchResults] = useState([]);
   const [userData, setUserData] = useState({});
-
-  useEffect(() => {
-    const id = window.localStorage.getItem("userID");
-    getSingleUser(id);
-  }, []);
 
   useEffect(() => {
     getNews();
   }, []);
 
-  const getSingleUser = async (id) => {
-    const apiUrl = `http://localhost:3000/getSingleUser/${id}`;
+  useEffect(() => {
+    const id = window.localStorage.getItem('userID');
 
-    try {
-      const response = await axios.get(apiUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+    const getSingleUser = async (id) => {
+      const apiUrl = `http://localhost:3000/getSingleUser/${id}`;
 
-      if (!response.data.isPremium) {
-        // Handle non-premium user scenario
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.error('Error fetching single user:', error);
       }
+    };
 
-      setUserData(response.data);
-    } catch (error) {
-      console.error('Error fetching single user:', error);
-    }
-  };
+    getSingleUser(id);
+  }, []);
 
-  const getNews = () => {
+  const getNews = (query = '') => {
+    const apiUrl = query
+    
+    ? `https://newsapi.org/v2/everything?q=${query}&apiKey=13aa3840ad6542d1b4f13aa762e81db9`
+    : 'https://newsapi.org/v2/everything?q=business&apiKey=13aa3840ad6542d1b4f13aa762e81db9';
+
     axios
-      .get("https://newsapi.org/v2/everything?q=business&apiKey=13aa3840ad6542d1b4f13aa762e81db9")
+      .get(apiUrl)
       .then((response) => {
-        setData(response.data.articles.filter((item) => item.urlToImage)); // Filter out items without images
+        setSearchResults(response.data.articles);
       })
       .catch((error) => {
-        console.error('Error fetching news:', error);
+        console.error(error);
       });
+  };
+
+  const handleSearch = (query) => {
+    getNews(query);
   };
 
   return (
     <>
-      <Navbar />
+      <Navbar onSearch={handleSearch} />
       <Container>
         <CardContainer>
-          {data.map((value, index) => (
+          {searchResults.map((value, index) => (
             <Card key={index}>
-              <CardImage
-                src={value.urlToImage}
-                alt="News"
-                onError={(e) => e.target.style.display = 'none'}
-              />
-              <CardBody>
+               <ScrollableCardBody>
+              <CardImageContainer>
+                {value.urlToImage && (
+                  <CardImage src={value.urlToImage} alt="News" />
+                )}
+              </CardImageContainer>
+
                 <h5>{value.title}</h5>
-                {userData.isPremium ? (
+                {userData.isPremium || userData.userType === 'Admin' ? (
                   <Link
-                    to={`/newsDetails/${index}/${encodeURIComponent(value.title)}/${encodeURIComponent(
-                      value.urlToImage
-                    )}/${encodeURIComponent(value.description)}`}
+                    to={`/newsDetails/${index}/${encodeURIComponent(
+                      value.title
+                    )}/${encodeURIComponent(value.urlToImage)}/${encodeURIComponent(
+                      value.description
+                    )}/${encodeURIComponent(value.url)}`}
                     state={{ articleData: value }}
                   >
                     <StyledButton target="_blank" rel="noopener noreferrer">
@@ -139,7 +163,7 @@ const Buisness = () => {
                     </StyledButton>
                   </Link>
                 )}
-              </CardBody>
+              </ScrollableCardBody>
             </Card>
           ))}
         </CardContainer>
@@ -148,4 +172,4 @@ const Buisness = () => {
   );
 };
 
-export default Buisness;
+export default Business;

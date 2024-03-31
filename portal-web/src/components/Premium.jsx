@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import './Premium.css';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom'; // Import Link
-
-
+import { useState, useEffect } from "react";
 
 const SubscriptionCard = ({ title, price, benefits, buttonText, onSubscribe }) => {
   return (
-    
     <div className="subscription-card">
-      
       <h3 className="card-title">{title}</h3>
       <p className="card-price">{price}</p>
       <ul className="card-benefits">
@@ -27,7 +21,27 @@ const Premium = () => {
   const [razorpayReady, setRazorpayReady] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [payments, setPayments] = useState([]);
   const userID = window.localStorage.getItem('userID');
+  console.log(userID);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/getSingleUser/${userID}`);
+        const userData = await response.json();
+        setUser(userData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setUser(null);
+      }
+    };
+    console.log(user);
+
+    if (userID) {
+      fetchUser();
+    }
+  }, [userID]);
 
   useEffect(() => {
     const loadScript = (src) => {
@@ -58,109 +72,176 @@ const Premium = () => {
     }
   }, []);
 
-  const handleSubscribe = (planId) => {
-    if (!razorpayReady) {
-      console.error("Razorpay SDK is not ready.");
-      return;
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const fetchPayments = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/get-payments");
+      const data = await response.json();
+      setPayments(data.payments);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
     }
-    const user = JSON.parse(localStorage.getItem('user'));
-    const updatedUser = { ...user, isPremium: true };
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-  
-    const options = getOptions(planId, user);
-    const rzp1 = new window.Razorpay(options);
-    rzp1.open();
   };
-  
+
+  let paymentAmount;
+  let paymentCurrency;
+
   const getOptions = (planId, user) => {
+    if (!user || !user.username) {
+      console.error("User data is not available");
+      return {};
+    }
+
+    // When initiating the payment
+    paymentAmount = planId === "monthly" ? '20' : '100';
+    paymentCurrency = 'INR';
+
     return {
       key: 'rzp_test_2LcW3MD6x5jzrt',
-      amount: planId === "monthly" ? '2000' : '10000',
-      currency: 'INR',
+      amount: paymentAmount,
+      currency: paymentCurrency,
       name: 'The News Portal',
       description: 'Subscription Payment',
-      //image: '../images/portal.jpeg',
       handler: function (response) {
-        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-        //navigate('../routes/Home');
         const paymentDetails = {
-          userId: userID, 
+          userId: user.userId,
+          username: user.username,
           paymentId: response.razorpay_payment_id,
           plan: planId,
           date: new Date().toISOString(),
+          amount: paymentAmount,
+          currency: paymentCurrency,
         };
-        console.log("Before fetch:", paymentDetails);
 
-        fetch('http://localhost:3000/api/store-payment-details', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(paymentDetails),
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Payment details stored successfully:', data);
-          navigate("/");
-          if (data.message && data.message.startsWith('Failed to send receipt email')) {
-            console.error('Failed to send receipt email:', data.error);
-          } else {
-            // Optionally handle further logic after confirmation
-          }
-        })
-          // Optionally handle further logic after confirmation
-      
-        .catch(error => {
-          console.error('Error:', error);
-        });
-      },
-      theme: {
-        color: '#0056b3'
+        console.log('paymentDetails.amount:', paymentDetails.amount);
+        console.log('paymentDetails.currency:', paymentDetails.currency, user?._id);
+
+        console.log('Payment successful:', response);
+
+        const newPaymentDetails = {
+          userId: user?._id,
+          email:user.email,
+          username: user.username,
+          paymentId: response.razorpay_payment_id,
+          plan: planId,
+          date: new Date().toISOString(),
+          amount: paymentDetails.amount,  // Using the globally stored paymentAmount
+          currency: paymentDetails.currency,  // Using the globally stored paymentCurrency
+        };
+
+        // Perform any additional actions, e.g., store payment details on the server
+        storePaymentDetails(newPaymentDetails);
       }
     };
   };
-  
+
+  const handleSubscribe = (planId) => {
+    if (!razorpayReady || !user || !user.username) {
+      return console.error("Razorpay SDK is not ready or user data is not available.");
+    }
+
+    const options = getOptions(planId, user);
+    const rzp1 = new window.Razorpay(options);
+
+    rzp1.on('payment.success', function (response) {
+      // Handle successful payment here
+    });
+
+    rzp1.on('payment.error', function (response) {
+      // Handle payment failure here
+      console.error('Payment failed:', response);
+      alert('Payment failed. Please try again.');
+    });
+
+    rzp1.open();
+  };
+
+  const storePaymentDetails = (paymentDetails) => {
+    // Make a POST request to your server to store payment details
+    fetch('http://localhost:3000/store-payment-details', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(paymentDetails),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Payment details stored successfully:', data);
+
+        const expiryDate = new Date(data.expiryDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZoneName: "short",
+        });
+
+        alert(`Payment successful! Your premium subscription is active until: ${expiryDate}`);
+        navigate("/");
+        fetchPayments();
+      })
+      .catch(error => {
+        console.error('Error storing payment details:', error);
+        alert('Payment successful, but an error occurred while processing. Please contact support.');
+      });
+  };
+
   return (
     <>
-    <Navbar />
-    <div className="premium-container">
-      <br />  <br /> <br /> <br /> <br />
-      <br /> <br /> 
-      <h2>Premium Subscriptions</h2>
-      <br /> <br />
-      
-      <div className="subscriptions">
-      
-        <SubscriptionCard
-          title="Monthly Subscription"
-          price="₹20/month"
-          benefits={[
-            "Font customization",
-            "Comment to a book",
-            "Unlock AudioBooks",
-            "Priority customer support",
-          ]}
-          buttonText="Subscribe Now"
-          onSubscribe={() => handleSubscribe("monthly")}
-        />
-        <SubscriptionCard
-          title="Annual Subscription"
-          price="₹100/year"
-          benefits={[
-            "Font customization",
-            "Comment to a book",
-            "Unlock AudioBooks",
-            "Priority customer support",
-            "2 months free",
-            "Unlock all features",
-            "Pay once in a while and just Read",
-          ]}
-          buttonText="Subscribe Now"
-          onSubscribe={() => handleSubscribe("annual")}
-        />
+      <Navbar />
+      <div style={{ marginTop: "6rem", textAlign: "center" }}>
+        <br />  <br /> <br /> <br /> <br />
+        <br /> <br />
+        <h2>Premium Subscriptions</h2>
+        <br /> <br />
+        {user && user.userType === "Admin" ? (
+          <div style={{ width:"500px", border: "2px solid #2ecc71", borderRadius: "10px", padding: "20px", marginBottom: "20px", margin: "0 auto" }}>
+            <span role="img" aria-label="Happy face" style={{ fontSize: "48px" }}>😊</span>
+            <h3 style={{ fontSize: "30px", marginTop: "10px" }}>Admin Features</h3>
+            <p style={{ fontSize: "28px", marginTop: "10px" }}>As an admin, you already have access to all premium features.</p>
+          </div>
+        ) : (
+          <div className="subscriptions">
+            <SubscriptionCard
+              title="Monthly Subscription"
+              price="₹20/month"
+              benefits={[
+                "Font customization",
+                "Comment to a book",
+                "Unlock AudioBooks",
+                "Priority customer support",
+              ]}
+              buttonText="Subscribe Now"
+              onSubscribe={() => handleSubscribe("monthly")}
+            />
+            <SubscriptionCard
+              title="Annual Subscription"
+              price="₹100/year"
+              benefits={[
+                "Font customization",
+                "Comment to a book",
+                "Unlock AudioBooks",
+                "Priority customer support",
+                "2 months free",
+                "Unlock all features",
+                "Pay once in a while and just Read",
+              ]}
+              buttonText="Subscribe Now"
+              onSubscribe={() => handleSubscribe("annual")}
+            />
+          </div>
+        )}
       </div>
-     
-    </div>
     </>
   );
 };

@@ -21,7 +21,6 @@ import Polls from "./components/Polls";
 import AdminPanel from "./components/AdminPanel";
 import AdminComments from "./components/AdminComments";
 import AdminPolls from "./components/AdminPolls";
-import Footer from "./components/footer";
 import AdminRecords from "./components/AdminRecords";
 import Trading from "./routes/Trading";
 import Crypto from "./routes/Crypto";
@@ -31,6 +30,7 @@ import Science from "./routes/Science";
 import Health from "./routes/Health";
 import Pahadi from "./routes/Pahadi";
 import AdminDash from "./components/AdminDash";
+import About from "./components/About";
 
 
 function App() {
@@ -55,12 +55,13 @@ function App() {
         <Route
           path="/admin/*"
           element={<AdminPanel />}
+          
         >
           <Route index element={<h2>Admin Dashboard</h2>} />
           <Route path="adminUser" element={<Admin />} />
           <Route path="adminComment" element={<AdminComments />} />
           <Route path="adminPolls" element={<AdminPolls />} />
-          <Route path="adminPolls" element={<AdminRecords/>} />
+          <Route path="adminRecords" element={<AdminRecords/>} />
           <Route path="admindash" element={<AdminDash/>}/>
 
 
@@ -90,17 +91,19 @@ function App() {
         <Route path="/science" element={<Science />} />
         <Route path="/health" element={<Health />} />
         <Route path="/pahadi" element={<Pahadi />} />
+        <Route path="/about" element={<About />} />
+
 
 
 
 
         <Route path="/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+        <Route path="/reset_password/:id/:token" element={<ResetPassword />} />
 
 
 
-        <Route path="/newsDetails/:index/:title/:urlToImage/:description" element={<NewsDetails />} />
-        <Route path="/update/:_id" element={<UpdateUser />} />
+        <Route path="/newsDetails/:index/:title/:urlToImage/:description/:url" element={<NewsDetails />} />
+        <Route path="/update/:id" element={<UpdateUser />} />
 
         <Route path="/admin" element={<AdminPanel/>}/>
         <Route path="/polls" element={<Polls/>}/>

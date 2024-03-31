@@ -32,8 +32,7 @@ const UserGraph = () => {
   return (
     <div className='bar'>
 
-      <h2>User Statistics</h2>
-      <BarChart width={600} height={400} data={userData}>
+      <BarChart width={1000} height={800} data={userData}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
