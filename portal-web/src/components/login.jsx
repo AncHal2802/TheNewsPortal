@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaUserShield } from "react-icons/fa";
 import { BsFillShieldLockFill } from "react-icons/bs";
 import { AiOutlineSwapRight } from "react-icons/ai";
+import '../cStyles/register_login.css';
 
 const Login = ({ setLoginUser, userType }) => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Login = ({ setLoginUser, userType }) => {
     email: "",
     password: "",
   });
+
 
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const [emailError, setEmailError] = useState(false);

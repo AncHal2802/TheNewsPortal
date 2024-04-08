@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import '../cStyles/register_login.css';
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ function ForgotPassword() {
         alert(res.data.message);
         if (res.data.status == "ok") {
           navigate("/login");
-          // return window.location.href = "/login";
+         
         }
       });
   };
@@ -28,14 +29,16 @@ function ForgotPassword() {
   //   return (window.location.href = "/");
   // }
   return (
-    <div className="flex justify-center items-center bg-orange-500 h-screen">
-      <div className="bg-blue-400 p-3 rounded w-1/4">
-        <h4 className="text-2xl font-bold mb-3">Forgot Password</h4>
+    <div className="forgotPasswordPage">
+      <div className="forgotPasswordForm">
+      <center><h3 className="text-2xl font-bold mb-3">Forgot Password</h3></center>
+        <br />
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="block font-semibold">
-              Email
+              <center><h4>Email</h4></center>
             </label>
+            <br />
             <input
               type="email"
               placeholder="Enter Email"
@@ -46,11 +49,11 @@ function ForgotPassword() {
               className="form-input bg-slate-600 rounded-0 w-full"
             />
           </div>
+          <br />
           <button
             type="submit"
-            className="btn bg-success text-yellow w-full rounded-0"
-          >
-            Send
+            className="btn bg-success text-yellow w-full rounded-0">
+              <center>Send</center>
           </button>
         </form>
       </div>

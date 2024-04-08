@@ -1,6 +1,8 @@
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
+import './Premium.css'
+
 
 const SubscriptionCard = ({ title, price, benefits, buttonText, onSubscribe }) => {
   return (
@@ -96,7 +98,7 @@ const Premium = () => {
     }
 
     // When initiating the payment
-    paymentAmount = planId === "monthly" ? '20' : '100';
+    paymentAmount = planId === "monthly" ? '2000' : '10000';
     paymentCurrency = 'INR';
 
     return {
@@ -200,9 +202,8 @@ const Premium = () => {
     <>
       <Navbar />
       <div style={{ marginTop: "6rem", textAlign: "center" }}>
-        <br />  <br /> <br /> <br /> <br />
-        <br /> <br />
-        <h2>Premium Subscriptions</h2>
+        <br />  <br /> <br /> 
+        <h1>Premium Subscriptions</h1>
         <br /> <br />
         {user && user.userType === "Admin" ? (
           <div style={{ width:"500px", border: "2px solid #2ecc71", borderRadius: "10px", padding: "20px", marginBottom: "20px", margin: "0 auto" }}>
@@ -216,10 +217,10 @@ const Premium = () => {
               title="Monthly Subscription"
               price="₹20/month"
               benefits={[
-                "Font customization",
-                "Comment to a book",
-                "Unlock AudioBooks",
-                "Priority customer support",
+                "Comment on News Posts",
+                "Participate on Polls",
+                "Read Article",
+                
               ]}
               buttonText="Subscribe Now"
               onSubscribe={() => handleSubscribe("monthly")}
@@ -228,13 +229,12 @@ const Premium = () => {
               title="Annual Subscription"
               price="₹100/year"
               benefits={[
-                "Font customization",
-                "Comment to a book",
-                "Unlock AudioBooks",
-                "Priority customer support",
-                "2 months free",
-                "Unlock all features",
-                "Pay once in a while and just Read",
+                "Be a Premium User",
+                "Unlock Comments Feature",
+                "Give  Reviews to Articles",
+                "Participate on Polls",
+                "Entire Year subscription",
+               
               ]}
               buttonText="Subscribe Now"
               onSubscribe={() => handleSubscribe("annual")}

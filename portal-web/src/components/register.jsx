@@ -23,13 +23,13 @@ const Register = () => {
   });
 
   const handleName = (e) => {
-    let inputValue = e.target.value.replace(/[^a-zA-Z]/gi, "");
+    let inputValue = e.target.value;
     setUser((prevUser) => ({ ...prevUser, name: inputValue }));
   };
 
   const [unameErr, setUnameErr] = useState(false);
   const unameHandler = (e) => {
-    let inputValue = e.target.value;
+    let inputValue = e.target.value.trim();
     setUnameErr(inputValue.trim() === "" || inputValue.length < 3);
     setUser((prevUser) => ({ ...prevUser, username: inputValue }));
   };

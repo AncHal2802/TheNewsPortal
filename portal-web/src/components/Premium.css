@@ -1,3 +1,10 @@
+body{
+  background-image: url('C:\Users\ancha\OneDrive\Desktop\Portal3\Premium\portal-web\src\images\mainbg.jpg'); 
+  background-size: cover; 
+  background-repeat: no-repeat; 
+  background-attachment: fixed; }
+
+
 .premium-container {
   text-align: center;
   padding: 20px;
@@ -7,13 +14,15 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 35px;
 }
 
 .subscription-card {
-  width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  width: 400px;
+  height: 475px;
+  background-color: #4175ec; 
+  border: 4px solid #2e2c2c;
+  border-radius: 30px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -26,23 +35,25 @@
 }
 
 .card-title {
-  color: #333;
+  color: #090606;
   margin-bottom: 20px;
 }
 
 .card-price {
-  font-size: 20px;
-  color: #007bff;
+  font-size: 25px;
+  color: #0e0366;
   margin-bottom: 25px;
 }
 
 .card-benefits {
   text-align: left;
   margin-bottom: 25px;
+  font-size: 23px;
+  color: #060202;
 }
 
 .card-button {
-  background-color: #5d64e0;
+  background-color: #040968;
   color: white;
   border: none;
   padding: 10px 20px;

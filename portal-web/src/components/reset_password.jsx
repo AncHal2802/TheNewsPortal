@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import '../cStyles/register_login.css';
 
 function ResetPassword() {
   const [user, setUser] = useState([]);
@@ -35,7 +36,7 @@ function ResetPassword() {
         alert(res.data.message);
         if (res.data.status == "ok") {
           navigate("/login");
-          // return window.location.href = "/login";
+         
         }
       });
   };
@@ -47,41 +48,47 @@ function ResetPassword() {
   //     return window.location.href = "/";
   // }
   return (
-    <div className="d-flex justify-content-center align-items-center bg-orange-500 vh-100">
-      <div className="bg-blue-400 p-3 rounded w-25">
-        <h4>Reset Password</h4>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label htmlFor="email">
-              <strong>New Password</strong>
-            </label>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              autoComplete="off"
-              name="password"
-              className="form-control bg-slate-600  rounded-0"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="email">
-              <strong>Confirm New Password</strong>
-            </label>
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              autoComplete="off"
-              name="reEnterPassword"
-              className="form-control bg-slate-600  rounded-0"
-              onChange={passMatchHandler}
-            />
-          </div>
-          {passMatchErr ? <span className="error">Mismatch Password</span> : ""}
-          <button type="submit" className="btn btn-success w-100 rounded-0">
-            Update
+    <div className="resetPasswordPage">
+      <div className="resetPasswordFormContainer">
+        <div className="bg-blue-400 p-3 rounded resetPasswordForm">
+          <h2>Reset Password</h2>
+          <br /><br />
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email">
+                <strong><h3>New Password</h3></strong>
+              </label>
+              <input
+                type="password"
+                placeholder="Enter Password"
+                autoComplete="off"
+                name="password"
+                className="form-control bg-slate-600  rounded-0"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <br  />
+            <div className="mb-3">
+              <label htmlFor="email">
+                <strong><h3>Confirm New Password</h3></strong>
+              </label>
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                autoComplete="off"
+                name="reEnterPassword"
+                className="form-control bg-slate-600  rounded-0"
+                onChange={passMatchHandler}
+              />
+            </div>
+            {passMatchErr ? <span className="error">Mismatch Password</span> : ""}
+            <button
+            type="submit"
+            className="btn bg-success text-yellow w-full rounded-0">
+              <center>Update</center>
           </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

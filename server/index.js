@@ -456,7 +456,7 @@ app.post("/store-payment-details", async (req, res) => {
     doc.fontSize(16).moveDown().text(`Date: ${formattedDate}`, 100);
     doc.text(`Payment ID: ${paymentId}`, 100);
     doc.text(`Plan: ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`, 100);
-    doc.text(`Amount: ${plan === "monthly" ? "₹49" : "₹499"}`, 100);
+    doc.text(`Amount: ${plan === "monthly" ? "₹20" : "₹100"}`, 100);
     doc.end();
 
     let expiryDate = new Date();
