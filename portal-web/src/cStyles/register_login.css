@@ -5,7 +5,7 @@
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif; 
-  background-color: #915151;
+  background-color: #f7f7f8;
 }
 
 .loginPage {
@@ -34,7 +34,7 @@ body {
 
 
 .contanier {
-  margin-top:25vh;
+  margin-top:10vh;
   display: flex;
   height: 80%;
   width: 60%;

@@ -28,7 +28,7 @@ const AdminRecords = () => {
             <th>Payment ID</th>
             <th>Plan</th>
             <th>Date</th>
-            <th>Amount</th>
+            <th>Expiry</th>
           </tr>
         </thead>
         <tbody>
@@ -39,7 +39,7 @@ const AdminRecords = () => {
               <td>{payment.paymentId}</td>
               <td>{payment.plan}</td>
               <td>{payment.date}</td>
-              <td>{payment.amount}</td>
+              <td>{payment.expiryDate}</td>
 --            </tr>
           ))}
         </tbody>

@@ -200,6 +200,7 @@ const Premium = () => {
 
   return (
     <>
+  
       <Navbar />
       <div style={{ marginTop: "6rem", textAlign: "center" }}>
         <br />  <br /> <br /> 
@@ -242,6 +243,7 @@ const Premium = () => {
           </div>
         )}
       </div>
+      
     </>
   );
 };

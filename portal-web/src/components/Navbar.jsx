@@ -43,7 +43,7 @@ const Navbar = ({ onSearch }) => {
     };
   }, [prevScrollPos, visible]);
 
-  const excludePaths = ['/', '/admin', '/login','/admin/admindash', '/register','/admin/adminUser','/admin/adminComment','/admin/adminPolls','/admin/adminRecords'];
+  const excludePaths = ['/', '/admin', '/login','/admin/admindash', '/register','/admin/adminUser','/admin/adminComment','/admin/adminPolls','/admin/adminRecords','/subscription'];
 
   return (
     <nav className={`NavbarItem ${visible ? '' : 'scrolled'}`}>

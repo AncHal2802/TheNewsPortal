@@ -112,7 +112,7 @@ const TopHeadings = () => {
     const apiUrl = query
     
     ? `https://newsapi.org/v2/everything?q=${query}&apiKey=13aa3840ad6542d1b4f13aa762e81db9`
-    : 'https://newsapi.org/v2/top-headlines?country=us&apiKey=13aa3840ad6542d1b4f13aa762e81db9';
+    : 'https://newsapi.org/v2/top-headlines?country=in&pageSize=50&apiKey=13aa3840ad6542d1b4f13aa762e81db9';
 
     axios
       .get(apiUrl)

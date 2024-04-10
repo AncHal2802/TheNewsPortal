@@ -5,6 +5,7 @@ import TopHeadings from '../routes/TopHeadings';
 import io from 'socket.io-client';
 import Polls from './Polls';
 import randomColor from 'randomcolor';
+import Modal from 'react-modal';
 
 const PageContainer = styled.div`
   display: flex;
@@ -16,16 +17,34 @@ const TopHeading = styled.div`
   box-sizing: border-box;
 `;
 
-const StyledLink = styled.a`
-  color: #007bff; 
-  text-decoration: none;
-  font-weight: bold;
-font-size:20px;
- padding: 10px;
-  &:hover {
-    text-decoration: underline;
-  }
+const StyledLink = styled.button`
+text-decoration: none;
+font-weight: bold;
+justify-content: center;
+margin: 30px;
+margin-left: 35rem;
+font-size: 20px;
+display: flex;
+padding: 10px;
+&:hover {
+  text-decoration: underline;
+}
 `;
+
+const StyledLink2 = styled.a`
+text-decoration: none;
+font-weight: bold;
+justify-content: center;
+margin: 30px;
+margin-left:15rem;
+font-size: 20px;
+display: flex;
+padding: 10px;
+&:hover {
+  text-decoration: underline;
+}
+`;
+
 const ContentContainer = styled.div`
   text-align: center;
   justify-content: center;
@@ -40,9 +59,8 @@ const Info = styled.div`
   margin-top: 0;
   margin-bottom: 10px;
   p {
-    font-size: 27px; 
+    font-size: 27px;
   }
-
 `;
 
 const InfoImage = styled.img`
@@ -53,7 +71,7 @@ const CommentBox = styled.div`
   text-align: left;
   margin-top: 20px;
   width: 100%;
-  max-width: 800px; /* Increase the max-width as needed */
+  max-width: 800px;
   margin: 0 auto;
 `;
 
@@ -66,7 +84,6 @@ const CommentBoxTitle = styled.h2`
 const CommentForm = styled.form`
   display: flex;
   flex-direction: column;
-  
 `;
 
 const CommentTextarea = styled.textarea`
@@ -90,11 +107,11 @@ const CommentButton = styled.button`
 
 const CommentsList = styled.ul`
   width: 100%;
-  max-width: 900px; /* Increase the max-width as needed */
+  max-width: 900px;
   list-style: none;
   padding: 0;
   margin: 0;
-  margin-top: 20px; /* Add margin-top as needed */
+  margin-top: 20px;
 `;
 
 const CommentItem = styled.li`
@@ -103,9 +120,10 @@ const CommentItem = styled.li`
   margin-bottom: 15px;
   border-radius: 8px;
   overflow: hidden;
-  display: flex; /* Display items horizontally */
-  flex-direction: column; /* Align items vertically */
+  display: flex;
+  flex-direction: column;
 `;
+
 const CommentContainer = styled.div`
   width: 100%;
   padding: 10px;
@@ -118,7 +136,7 @@ const CommentHeader = styled.div`
   color: #fff;
   padding: 8px;
   border-radius: 4px;
-`;;
+`;
 
 const Strong = styled.strong`
   font-weight: bold;
@@ -144,6 +162,23 @@ const OtherComment = styled.div`
   background-color: #f9f9f9;
 `;
 
+const StyledModalContent = styled.div`
+  text-align: center;
+`;
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    overflowY: 'scroll', // Make modal content scrollable
+    maxHeight: '80vh', // Set maximum height for the modal
+  },
+};
+
 const NewsDetails = () => {
   const { title, urlToImage, description, url } = useParams();
   const [comment, setComment] = useState('');
@@ -152,8 +187,7 @@ const NewsDetails = () => {
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const loggedInUserId = window.localStorage.getItem('userID');
   const socket = io('http://localhost:3000');
-
-  const [userColors, setUserColors] = useState({});
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
@@ -206,8 +240,6 @@ const NewsDetails = () => {
               colors[userId._id] = randomColor();
             }
           });
-
-          setUserColors(colors);
 
           const formattedComments = commentsData.map(({ userId, text, replyTo }) => ({
             commentId: userId._id,
@@ -275,8 +307,26 @@ const NewsDetails = () => {
         <Info>
           <h3>{title}</h3>
           <InfoImage src={urlToImage} alt="Article" />
-          <p>{description}</p><StyledLink href={url}>Read More</StyledLink>
-          
+
+          <StyledLink href="#" onClick={() => setModalIsOpen(true)}>
+            Read More
+          </StyledLink>
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={() => setModalIsOpen(false)}
+            style={customStyles}
+            contentLabel="Article Modal"
+          >
+            <StyledModalContent>
+              <h2 style={{ fontSize: '30px' }}>{title}</h2>
+              <p style={{ fontSize: '20px' }}>{description}</p>
+              <StyledLink2 href={url} rel="noopener noreferrer">
+                Read Full Article
+              </StyledLink2>
+
+              <button onClick={() => setModalIsOpen(false)}>Close</button>
+            </StyledModalContent>
+          </Modal>
         </Info>
         <Polls articleTitle={title} />
         <CommentBox>
@@ -310,7 +360,8 @@ const NewsDetails = () => {
                         {c.replies.map((reply, replyIndex) => (
                           <CommentItem
                             key={replyIndex}
-                            className={`comment-item ${reply.commentId === loggedInUserId ? 'user-comment' : 'other-comment'}`}
+                            className={`comment-item ${reply.commentId === loggedInUserId ? 'user-comment' : 'other-comment'
+                              }`}
                           >
                             <CommentContainer>
                               <CommentHeader style={{ backgroundColor: userColors[reply.commentId] }}>

@@ -185,7 +185,7 @@ app.post("/register", async (req, res) => {
       name,
       username,
       email,
-      password: hashedPassword,
+      password,
       userType,
       comments: [],
     });
@@ -217,7 +217,7 @@ app.post("/login", async (req, res) => {
 
     console.log("ENCRYPT Password ", passwordMatch);
 
-    if (passwordMatch) {
+    if (password!==user.password) {
       return res.send({ message: "Password didn't match" });
     }
 
@@ -253,7 +253,20 @@ app.post("/forgotpassword", async (req, res) => {
   });
 
   const url = `http://localhost:5173/reset_password/${user._id}/${token}`;
-  const emailHtml = `<h2>Click to reset password : ${url}</h2>`;
+  const emailHtml = `
+  <a href="${url}" style="text-decoration: none;">
+    <button style="background-color: #4CAF50; /* Green */
+                    border: none;
+                    color: white;
+                    padding: 15px 32px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    margin: 4px 2px;
+                    cursor: pointer;">Click to reset password</button>
+  </a>
+`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
